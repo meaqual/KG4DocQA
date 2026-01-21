@@ -3678,6 +3678,8 @@
     },
     {
       "id": "kg_Issues_0018",
+      "class": "Issues",
+      "name": "处理温度变化对时序优化的影响",
       "descriptions": "XTop 2021.12版本新增了温度缩放功能，用于时序优化。此外，还增强了延迟计算，考虑了R/C树来估计布线延迟，并考虑了OCV sigma转换的影响。同时，改进了设置修复的预分析准确性，加快了评估速度，并支持自动调整非路径因子以提高精度。这些增强功能共同帮助处理温度变化对时序优化的影响。",
       "chunk_id": "_xtop_release_0004_0001"
     },
@@ -3746,6 +3748,8 @@
     },
     {
       "id": "kg_Issues_0028",
+      "class": "Issues",
+      "name": "What happen if fatal error occurs during the import_designs command",
       "descriptions": "When a fatal error occurs during the import_designs command, the affected file is marked as failed, and its contents are ignored. After the command completes, it provides a summary of the number of designs that failed to build. Detailed parse logs can be reviewed via the GUI or using the report_design_file_status command. Even if no files failed, it is recommended to check warnings and nonfatal errors with report_design_file_status to identify potential issues early.",
       "chunk_id": "_xtop_handbook_0117_0001"
     },
@@ -3842,6 +3846,8 @@
     },
     {
       "id": "kg_Issues_0042",
+      "class": "Issues",
+      "name": "fix_setup_path_violations修复路径",
       "descriptions": "By default, this command will try to fix the violated paths to slack greater than 0, and will not break the hold, max transition, and max capacitance, or not to make them worse if there is already a violation. Commonly, this is enough since the algorithm is always a little pessimistic. However, if you really concerned about the effect and there are enough resources in the design, you can over-fix it by adding a positive target, and over-constraint the hold, transition, capacitance by adding a positive margin with option -setup_target, -hold_margin, -transition_margin and -capacitance_margin respectively. If the target and margins are not specified, corresponding parameters eco_hold_slack_target, eco_hold_slack_margin, eco_transition_slack_margin, and eco_capacitance_slack_margin will be used as default.",
       "chunk_id": "_xtop_handbook_0240_0002"
     },
@@ -3864,7 +3870,6 @@
       "class": "Issues",
       "name": "修复特定违规的引脚",
       "descriptions": "通过指定违规引脚的集合来修复特定违规。在XTop中，即使只指定了部分sink，也会考虑整个网络的违规。一旦指定一个引脚，网络上的所有引脚都会被考虑进去。时序摘要和失败原因也仅限于网络上的引脚。当用户指定违规引脚时，工具会自动扩展它们的所有镜像引脚。",
-      "descriptions_zh": "通过指定违规引脚的集合来修复特定违规。在XTop中，即使只指定了部分sink，也会考虑整个网络的违规。一旦指定一个引脚，网络上的所有引脚都会被考虑进去。时序摘要和失败原因也仅限于网络上的引脚。当用户指定违规引脚时，工具会自动扩展它们的所有镜像引脚。",
       "chunk_id": "_xtop_handbook_0241_0006"
     },
     {
@@ -3904,6 +3909,8 @@
     },
     {
       "id": "kg_Issues_0051",
+      "class": "Issues",
+      "name": "LEF文件是否已成功链接",
       "descriptions": "在使用link_reference_library命令链接LEF文件后，可以通过运行report_reference_library_file_status命令来检查LEF文件的状态。例如，执行xtop > report_reference_library_file_status后，会显示类似'.../tutorial/input_files/lef/tutorial.lef : succeeded'的信息，表明LEF文件已成功链接。同时，命令输出可能会包含警告信息，如'Warning(line: 674-734) : Cumulative Antenna ratios already set with different value.'，这些警告可能提示LEF文件中的某些设置存在冲突或需要注意的地方。",
       "chunk_id": "_xtop_faq_v3_0004_0001"
     },
@@ -3958,6 +3965,8 @@
     },
     {
       "id": "kg_Issues_0059",
+      "class": "Issues",
+      "name": "设置extra setup derate的方式",
       "descriptions": "当前XTop 中共有三种方式设置extra setup derate：1. parameter：eco_auto_setup_extra_derate，当设置为true时，工具会根据特定条件自动调整derate值；2. command：set_setup_extra_derate，用于手动设置特定scenario的derate值；3. parameter：eco_voltage_setup_extra_derate，允许设置多组voltage-derate pairs，进行线性插值。优先级顺序为：eco_voltage_setup_extra_derate > set_setup_extra_derate > eco_auto_setup_extra_derate。如果同时设置了scenario_setup_extra_derate和setup_extra_derate，以set_setup_extra_derate为准。",
       "chunk_id": "_xtop_faq_v3_0040_0001"
     },
@@ -3977,11 +3986,15 @@
     },
     {
       "id": "kg_Issues_0062",
+      "class": "Issues",
+      "name": "7nm工艺Sizing修hold与D1/D2单元",
       "descriptions": "在7nm工艺中，当进行Sizing修hold时，可能会将单元size down到D1。D1单元的驱动能力非常弱，导致严重的信号完整性（SI）问题，进而引起setup时序变坏。特别是在先进工艺节点或低电压设计中，建议在修复hold时禁用D1/D2单元，可以通过set_dont_touch命令实现。",
       "chunk_id": "_xtop_faq_v3_0045_0001"
     },
     {
       "id": "kg_Issues_0063",
+      "class": "Issues",
+      "name": "leakage功耗计算规则的版本变更及其在修复过程中的一个关键影响",
       "descriptions": "1. 200825 版本之前，取cell leakage 中worst 值；\n2. 200825 版本之后，对定义了primary power pin 的lib cell ，取related_power_pin 为primary power pin 的leakage 均值；对没有定义primary power pin 的lib cell，取该cell 所有leakage 的均值；\n3. Fix_leakage 时，leakage 值取自reference corner lib，因此如果leakage trend 在不同corner 下不一致，reference corner 的选取可能导致替换cell 的数量不同；例如：如果default reference corner 由于channel 11 leakage> channel 8 leakage，keywords 设置为“8P57PDSVT 11P57PDSVT”导致大量no_alternative_cell fail reason；切换reference corner ，leakage 变为channel 8>channel 11 ，no_alternative_cell fail reason 大量减少。",
       "chunk_id": "_xtop_faq_v3_0049_0001"
     },
@@ -4204,11 +4217,15 @@
     },
     {
       "id": "kg_Issues_0095",
+      "class": "Issues",
+      "name": "ECO优化操作的过程",
       "descriptions": "The slide describes the process of removing a buffer during an ECO (Engineering Change Order) in the XTop training. The main points include data preparation, design setup, timing fix, and appendix. The instructions mention right-clicking a buffer on the bottleneck analysis table, path view, or layout. The layout view shows the circuit layout with a highlighted buffer marked by a purple line. The ECO Actions Window displays the current action, action history, affected connections, and timing results such as setup slacks, hold slacks, transition slacks. The timing results section shows the impact of buffer removal on timing, including original and current worst negative slack (wns) values and the biggest gain in timing after removal. Annotations indicate where to click to view connections, the buffer to remove, and the timing results changes. Additional information includes the slide number and Empyrean logo placement.",
       "chunk_id": "_xtop_training_0055_0001"
     },
     {
       "id": "kg_Issues_0096",
+      "class": "Issues",
+      "name": "以Leakage Power, Dynamic Power, and Area为优化目标的cost optimization process",
       "descriptions": "The slide page 69 of the XTop Training document provides an overview of the cost optimization process in the EDA tool, focusing on Leakage Power, Dynamic Power, and Area. The process begins with data preparation, which can be done automatically or manually via ECO Out & QoR. The navigation allows users to view the cost overview, which includes Leakage Power, Dynamic Power, and Area. The Leakage Power Summary shows the total leakage power and its distribution across different cell types (LVT, HVT, others) with specific counts and percentages. The Dynamic Power Summary includes internal and switching power for different cell types (Sequential, Combinational) with respective counts and power values. The Area Summary provides the total area, count of cells, and density. The annotations mention jumping to the fail reason debugging window and automatic optimization.",
       "chunk_id": "_xtop_training_0069_0001"
     },
@@ -4221,6 +4238,8 @@
     },
     {
       "id": "kg_Issues_0098",
+      "class": "Issues",
+      "name": "Debug fail reasons of unfixed GBA violated endpoints",
       "descriptions": "The process involves three main steps: Auto Analysis, Manual Analysis, and ECO Out & QoR. First, set up the GBA summary by identifying the top N endpoints with the specified slack scenario and endpoint name. Next, drag a violated endpoint from the GBA summary to the 'Fail Reason' window to analyze its details. Then, use the object mode to show detailed fail reasons, which are categorized into percentages. Finally, a table displays detailed fail reasons for each pin on the GBA critical path, including columns like Pin, Insert Buffer, Size Cell, Split Net, and Remove Buffer, with examples provided for each row.",
       "chunk_id": "_xtop_training_0072_0001"
     },
@@ -4488,11 +4507,6 @@
       ]
     },
     {
-      "id": "kg_Operation_0005",
-      "effect": "执行该操作后，当优化过程访问到指定的pins时，会自动输出详细的log信息，其他点则使用默认的log_level。如果所有debug_pins都被访问过，则不再进行优化动作，只更新时序。设置debug_pins不会影响其他参数如only_pins或violations的使用，但如果设置不当可能导致某些pin无法被访问到，从而不影响优化过程。",
-      "chunk_id": "_xtop_application_0010_0001"
-    },
-    {
       "id": "kg_Operation_0006",
       "class": "Operation",
       "name": "使用XTop进行密度控制",
@@ -4575,11 +4589,6 @@
       ],
       "effect": "能够准确查看IO pin的slack信息，但需要注意XTop内部存储的slack可能与实际传递的slack存在差异，可能导致slack变化较大，但通常仅影响IO pin cell，对其他点的正常fix无显著影响。",
       "chunk_id": "_xtop_debug_0014_0001"
-    },
-    {
-      "id": "kg_Operation_0012",
-      "effect": "执行该操作后的效果和影响",
-      "chunk_id": "_xtop_debug_0015_0001"
     },
     {
       "id": "kg_Operation_0013",
@@ -4874,11 +4883,6 @@
       "chunk_id": "_xtop_release_0006_0001"
     },
     {
-      "id": "kg_Operation_0034",
-      "effect": "该操作允许用户手动替换特定单元以优化设计，可能影响时序、功耗和布线，需要确保替换后的单元符合设计规则和物理实现要求。",
-      "chunk_id": "_xtop_release_0006_0001"
-    },
-    {
       "id": "kg_Operation_0035",
       "class": "Operation",
       "name": "Enhanced summarize_buffers",
@@ -4931,11 +4935,6 @@
       "chunk_id": "_xtop_release_0009_0001"
     },
     {
-      "id": "kg_Operation_0039",
-      "error": "文档中没有找到关于启用postmask ECO模式的具体信息。",
-      "chunk_id": "_xtop_release_0015_0001"
-    },
-    {
       "id": "kg_Operation_0040",
       "class": "Operation",
       "name": "Extracting",
@@ -4972,11 +4971,6 @@
       "chunk_id": "_xtop_ug_0005_0001"
     },
     {
-      "id": "kg_Operation_0043",
-      "effect": "指定源文件后，ICExplorer-XTop将从该文件读取命令并执行。如果在执行TCL命令时发生错误，且未指定-auto_exit选项，工具可能会中断并挂起；若指定了-auto_exit，则会在遇到错误时自动退出。",
-      "chunk_id": "_xtop_ug_0006_0001"
-    },
-    {
       "id": "kg_Operation_0044",
       "class": "Operation",
       "name": "执行指定命令",
@@ -4987,16 +4981,6 @@
       ],
       "effect": "在ICExplorer-XTop初始化和设置完成后，执行用户指定的命令。这允许用户在工具启动后立即运行特定的TCL命令，可能用于自动化流程或初始化配置。副作用可能包括命令执行中的错误导致工具异常退出，但通过-auto_exit选项可自动退出以避免挂起。",
       "chunk_id": "_xtop_ug_0006_0001"
-    },
-    {
-      "id": "kg_Operation_0045",
-      "effect": "设置日志文件的后缀名，生成的命令日志文件和日志文件将分别命名为command_suffix.txt和log_suffix.txt。若未指定后缀，将使用默认值。",
-      "chunk_id": "_xtop_ug_0006_0001"
-    },
-    {
-      "id": "kg_Operation_0046",
-      "effect": "执行该操作后的效果和影响",
-      "chunk_id": "_xtop_ug_0010_0001"
     },
     {
       "id": "kg_Operation_0047",
@@ -5145,11 +5129,6 @@
       ],
       "effect": "Executing this command will remove all power domain configurations associated with the specified design. This can lead to loss of previously imported power domain settings and may require re-importing them if needed. It is important to ensure that this operation is performed only when necessary to avoid unintended design configuration changes.",
       "chunk_id": "_xtop_ug_0019_0001"
-    },
-    {
-      "id": "kg_Operation_0054",
-      "effect": "设置对象为dont touch后，这些对象在优化过程中不会被修改。对于路径，工具不会尝试修复该路径上的违规情况。这可能会导致某些优化无法进行，从而影响整体设计性能或时序。",
-      "chunk_id": "_xtop_ug_0024_0001"
     },
     {
       "id": "kg_Operation_0055",
@@ -5311,11 +5290,6 @@
       ],
       "effect": "移除指定的缓冲器，可能影响时序性能，需重新进行时序分析和验证",
       "chunk_id": "_xtop_ug_0038_0001"
-    },
-    {
-      "id": "kg_Operation_0064",
-      "effect": "撤销最近的manual eco操作，最多可撤销32次。可能的副作用是如果撤销了关键步骤可能导致设计回退到之前的状态，需要重新进行后续操作。",
-      "chunk_id": "_xtop_ug_0042_0001"
     },
     {
       "id": "kg_Operation_0065",
@@ -5509,17 +5483,6 @@
       "chunk_id": "_xtop_ug_0058_0001"
     },
     {
-      "id": "kg_Operation_0077",
-      "related_commands": [
-        "insert buffer",
-        "size cell",
-        "split net",
-        "remove buffer"
-      ],
-      "effect": "插入缓冲器可以改善信号传输延迟，解决时序问题，但可能增加功耗和面积。",
-      "chunk_id": "_xtop_ug_0059_0001"
-    },
-    {
       "id": "kg_Operation_0078",
       "class": "Operation",
       "name": "remove buffer",
@@ -5538,11 +5501,6 @@
       ],
       "effect": "移除缓冲器可以减少设计中的延迟和功耗，但可能导致时序违规或信号完整性问题。",
       "chunk_id": "_xtop_ug_0059_0001"
-    },
-    {
-      "id": "kg_Operation_0079",
-      "effect": "执行该操作后的效果和影响",
-      "chunk_id": "_xtop_ug_0062_0001"
     },
     {
       "id": "kg_Operation_0080",
@@ -5586,11 +5544,6 @@
       ],
       "effect": "执行后将返回符合条件的端口列表，如示例中的portcout[6]和debugpc[10]。此操作不会修改设计，仅用于查询和分析。",
       "chunk_id": "_xtop_handbook_0039_0001"
-    },
-    {
-      "id": "kg_Operation_0083",
-      "effect": "设置指定单元的轨电压，当在层次化单元上设置时，所有下层单元将被设置为相同的值。若未指定 -min 或 -max，工具会为 min/max 两种情况设置值。若未指定 scenario/corner/mode，工具会为所有场景设置值。使用 -not_recursive 可避免递归设置下层单元的值。",
-      "chunk_id": "_xtop_handbook_0050_0001"
     },
     {
       "id": "kg_Operation_0084",
@@ -5655,13 +5608,6 @@
         "check_library_completeness"
       ],
       "effect": "执行该操作后，会检查所有单元实例的参考库单元是否有效。如果发现无效的参考库单元，将报告这些单元并返回false。使用-include_instance选项时，会列出引用无效单元的实例名称，且通过-truncate参数可控制显示的实例数量。可能的副作用是，当存在大量无效实例时，输出信息可能过多，影响性能或可读性。",
-      "error": null,
-      "example": null,
-      "note": null,
-      "parameter": null,
-      "return": null,
-      "usage": null,
-      "warning": null,
       "chunk_id": "_xtop_handbook_0060_0001"
     },
     {
@@ -5676,16 +5622,6 @@
       ],
       "effect": "限制报告的实例数量，减少输出信息量，可能隐藏部分实例信息，影响问题诊断的全面性。",
       "chunk_id": "_xtop_handbook_0060_0001"
-    },
-    {
-      "id": "kg_Operation_0088",
-      "effect": "自动识别属于IO路径的引脚，并清除之前从ilm文件读取的所有标记。建议在XTop中包含时序路径报告以获得更好的结果。使用-includ_common_path选项可以包含同时具有r2r和IO路径的引脚。可能的副作用包括覆盖之前标记的引脚，影响后续的ECO流程。",
-      "chunk_id": "_xtop_handbook_0116_0001"
-    },
-    {
-      "id": "kg_Operation_0089",
-      "effect": "执行该操作后，指定的IO路径引脚将被标记为'dont touch'，防止被优化或修改，这有助于保持设计的时序路径完整性，但可能限制工具对这些引脚的优化能力，导致潜在的面积或性能影响。",
-      "chunk_id": "_xtop_handbook_0116_0001"
     },
     {
       "id": "kg_Operation_0090",
@@ -5711,11 +5647,6 @@
         "report_design_file_status"
       ],
       "effect": "所有已导入的设计将被打开，允许用户进行后续操作如布局布线、验证等。如果导入过程中存在警告或非致命错误，可能会影响设计的完整性和后续流程，需通过report_design_file_status检查。",
-      "chunk_id": "_xtop_handbook_0117_0001"
-    },
-    {
-      "id": "kg_Operation_0092",
-      "effect": "执行该操作后，设计文件的内容会被导入到定义的设计中。如果遇到致命错误，文件会被标记为失败并忽略其内容。操作完成后，会打印导入失败的设计数量摘要，并建议检查所有警告和非致命错误以尽早发现问题。此外，该操作会触发后续步骤如打开所有设计和解析设计链接。",
       "chunk_id": "_xtop_handbook_0117_0001"
     },
     {
@@ -5752,17 +5683,6 @@
       "chunk_id": "_xtop_handbook_0119_0001"
     },
     {
-      "id": "kg_Operation_0095",
-      "related_commands": [
-        "link_timing_library",
-        "-corner",
-        "-search_type",
-        "unlink_timing_library",
-        "report_timing_library_file_status"
-      ],
-      "chunk_id": "_xtop_handbook_0121_0001"
-    },
-    {
       "id": "kg_Operation_0096",
       "class": "Operation",
       "name": "读取时序数据",
@@ -5776,20 +5696,6 @@
       ],
       "effect": "成功读取时序数据并用于后续分析。在memory_saving_mode下，会丢弃未使用引脚的数据，不推荐在此模式下调整路径松弛度或追加其他场景的时序报告，因为许多引脚的时钟引脚信息和时序数据会丢失。",
       "chunk_id": "_xtop_handbook_0127_0001"
-    },
-    {
-      "id": "kg_Operation_0097",
-      "class": "Operation",
-      "name": null,
-      "description": null,
-      "related_commands": null,
-      "effect": null,
-      "chunk_id": "_xtop_handbook_0134_0003"
-    },
-    {
-      "id": "kg_Operation_0098",
-      "error": "未找到与启用postmask ECO模式相关的文档内容。",
-      "chunk_id": "_xtop_handbook_0140_0001"
     },
     {
       "id": "kg_Operation_0099",
@@ -5838,11 +5744,6 @@
       ],
       "effect": "执行该操作后，指定的填充单元将在ECO和优化过程中被移除，从而可能影响设计的物理布局和面积。副作用包括可能移除必要的填充单元，导致设计规则检查失败或布局问题。",
       "chunk_id": "_xtop_handbook_0177_0001"
-    },
-    {
-      "id": "kg_Operation_0102",
-      "effect": "插入缓冲器和反相器链以缓冲指定网络上的引脚。这可能影响时序收敛，需要重新进行时序分析。如果布局合法化失败，可能会报告错误并回滚。",
-      "chunk_id": "_xtop_handbook_0193_0001"
     },
     {
       "id": "kg_Operation_0103",
@@ -5923,11 +5824,6 @@
       "chunk_id": "_xtop_handbook_0216_0001"
     },
     {
-      "id": "kg_Operation_0108",
-      "effect": "执行该操作后，将汇总全局基于分析的时序违规情况，输出违规计数、最差松弛度、总负松弛度。如果存在通过一个引脚的路径，将优先考虑这些路径的最差松弛度，除非指定了-exclude_path选项。当指定引脚时，仅考虑引脚列表中的端点。",
-      "chunk_id": "_xtop_handbook_0216_0001"
-    },
-    {
       "id": "kg_Operation_0109",
       "class": "Operation",
       "name": "report setup timing",
@@ -5972,11 +5868,6 @@
       "chunk_id": "_xtop_handbook_0225_0002"
     },
     {
-      "id": "kg_Operation_0112",
-      "effect": "该操作会放大时序违规（通过将负松弛值乘以指定因子），可能影响时序收敛，需要谨慎调整因子值。放大后可能使违规更明显，但有时有助于优化工具更好地识别和修复问题。",
-      "chunk_id": "_xtop_handbook_0232_0001"
-    },
-    {
       "id": "kg_Operation_0113",
       "class": "Operation",
       "name": "Modify violations of all scenarios",
@@ -5990,21 +5881,6 @@
       ],
       "effect": "The timing violations are scaled by the specified factor, which can either enlarge or shrink them depending on the factor value. This may affect the timing analysis results and could lead to different optimization outcomes in the design.",
       "chunk_id": "_xtop_handbook_0232_0001"
-    },
-    {
-      "id": "kg_Operation_0114",
-      "effect": "修复设计中的扇出违规，通过分割网络保持扇出数量不超过用户定义的最大阈值。如果未完全修复违规，将报告解决方案数量、面积增加和失败原因统计。默认生成违规和失败原因报告，但可通过-disable_report选项禁用。修复过程中会自动扩展用户指定违规引脚的所有镜像引脚。",
-      "chunk_id": "_xtop_handbook_0235_0001"
-    },
-    {
-      "id": "kg_Operation_0115",
-      "effect": "修复噪声毛刺违规，选择最佳解决方案（分割网络或调整单元大小）。报告解决方案数量、面积增加和未完全修复的违规原因统计。可能的副作用包括面积增加和设计复杂性增加。",
-      "chunk_id": "_xtop_handbook_0236_0001"
-    },
-    {
-      "id": "kg_Operation_0116",
-      "effect": "执行该操作后，工具将报告解决方案的数量、面积增加情况以及未完全修复的违规原因的统计信息。如果违规未被完全修复，会提供失败原因的统计。此外，该命令返回提交的解决方案数量。",
-      "chunk_id": "_xtop_handbook_0236_0001"
     },
     {
       "id": "kg_Operation_0117",
@@ -6107,18 +5983,6 @@
       ]
     },
     {
-      "id": "kg_Operation_0124",
-      "effect": "增加网络负载以修复小的保持违规，若无法通过插入虚拟单元解决，将自动尝试插入缓冲器。可能的副作用包括增加设计复杂性和时序收敛难度。",
-      "chunk_id": "_xtop_handbook_0238_0007"
-    },
-    {
-      "id": "kg_Operation_0125",
-      "debug_pins": "pin_list",
-      "paths": "paths",
-      "unreasonable_negative_slack": "unreasonable_negative_slack",
-      "chunk_id": "_xtop_handbook_0240_0001"
-    },
-    {
       "id": "kg_Operation_0126",
       "class": "Operation",
       "name": "Over-constraint Hold, Transition, Capacitance by Adding Positive Margin",
@@ -6135,11 +5999,6 @@
       ],
       "effect": "执行该操作后，可以确保路径的松弛度更高，减少时序违规的可能性。然而，这可能导致资源使用增加，或者在设计中引入不必要的约束，从而影响后续的优化步骤。",
       "chunk_id": "_xtop_handbook_0240_0002"
-    },
-    {
-      "id": "kg_Operation_0127",
-      "effect": "执行该操作后，会自动应用时钟相关的ECO操作来修正设置或保持违规。这可能导致设计中插入缓冲器或反相器，从而改变时序路径并可能影响功耗和面积。",
-      "chunk_id": "_xtop_handbook_0243_0001"
     },
     {
       "id": "kg_Operation_0128",
@@ -6175,11 +6034,6 @@
       "chunk_id": "_xtop_handbook_0245_0001"
     },
     {
-      "id": "kg_Operation_0130",
-      "effect": "执行该操作后，可以获取符合指定排名条件的引脚集合。如果没有引脚符合排名条件，则不会返回任何内容。仅使用最近标记的排名类型，如果执行任何ECO操作后建议重新标记排名类型。如果引脚被标记为hold，则返回输入引脚，否则返回输出引脚。",
-      "chunk_id": "_xtop_handbook_0246_0001"
-    },
-    {
       "id": "kg_Operation_0131",
       "class": "Operation",
       "name": "获取排名引脚",
@@ -6213,16 +6067,6 @@
       "chunk_id": "_xtop_handbook_0249_0001"
     },
     {
-      "id": "kg_Operation_0133",
-      "effect": "优化设计面积，通过移除缓冲器或缩小单元尺寸，不引入时序和设计规则违规。可能的副作用包括需要设置负的setup margin以允许优化后违反setup时序。",
-      "chunk_id": "_xtop_handbook_0256_0001"
-    },
-    {
-      "id": "kg_Operation_0134",
-      "effect": "允许在优化过程中打破设置（setup）约束，可能导致时序违规，但可以实现更小的面积优化。",
-      "chunk_id": "_xtop_handbook_0256_0001"
-    },
-    {
       "id": "kg_Operation_0135",
       "class": "Operation",
       "name": "设置仅对指定单元格进行尺寸调整",
@@ -6234,11 +6078,6 @@
       ],
       "effect": "执行该操作后，仅对指定的单元格及其镜像单元格进行尺寸调整，可能影响布局的物理实现和后续的布线过程。",
       "chunk_id": "_xtop_handbook_0256_0003"
-    },
-    {
-      "id": "kg_Operation_0136",
-      "effect": "生成增量SDF文件，用于修复时序违规。Hold违规可以完全清除，Setup违规会尝试修复。文件保存在指定目录，文件名以指定前缀开头并包含场景名。设置-target参数时，会使用该目标值而非默认参数。较大的reserved_cell_delay_percentage值会减少可修复的slack量。",
-      "chunk_id": "_xtop_handbook_0264_0001"
     },
     {
       "id": "kg_Operation_0137",
@@ -6405,6 +6244,16 @@
     },
     {
       "id": "kg_Operation_0148",
+      "class": "Operation",
+      "name": "时序优化中如何去skip 某些XXX",
+      "description": "该片段详细描述了在使用XTop工具进行时序优化时，如何有选择性地跳过（skip）特定类型的路径或模块，以防止它们被工具自动修改。操作核心是使用一系列set_dont_touch或set_*_dont_touch命令，针对不同对象（如I/O端口、子模块、层次路径、路径起点/终点、模块边界/内部路径）设置“禁止触碰”属性。",
+      "related_commands": [
+        "set_dont_touch",
+        "-set_module_dont_touch",
+        "set_hier_path_dont_touch",
+        "-get_io_path_pins",
+        "get_paths"
+      ],
       "effect": "执行该操作后，指定的路径、模块或层次结构将被排除在时序优化过程之外，不会被工具进行优化。这可能导致设计的某些部分未被优化，从而影响整体时序性能。",
       "chunk_id": "_xtop_faq_v3_0034_0001"
     },
@@ -6482,6 +6331,13 @@
     },
     {
       "id": "kg_Operation_0154",
+      "class": "Operation",
+      "name": "解决ECO输出脚本问题",
+      "description": "在使用split_net命令进行时序优化后，输出ECO脚本时可能遇到的问题（动作跨层次）及解决方案。核心步骤是使用write design changes命令输出脚本，并根据是否添加-force选项来处理跨层次动作。",
+      "related_commands": [
+        "split_net",
+        "write design changes"
+      ],
       "effect": "确保输出的ECO脚本能够正确执行，避免因跨层次操作导致的错误。使用-force选项时，会将不支持的命令转换为atomic格式，可能增加脚本的复杂度但保证执行顺序。",
       "chunk_id": "_xtop_faq_v3_0048_0001"
     },
@@ -6544,6 +6400,16 @@
     },
     {
       "id": "kg_Operation_0159",
+      "class": "Operation",
+      "name": "Debugging 未修复的时序违例",
+      "description": "该操作描述了如何定位和分析在时序优化后仍未修复的时序违例（Violations）。方法包括：1. 使用命令行报告特定数量最差的违例端点（summarize_path_violations或 summarize_gba_violations结合 -with_top_n选项）；2. 通过GUI菜单直观查看违例列表；3. 进一步通过 report_fail_reasons命令，针对具体的违例路径或违例端点，获取其未修复的根本原因诊断报告。",
+      "related_commands": [
+        "summarize_path_violations",
+        "summarize_gba_violations",
+        "report_fail_reasons",
+        "get_paths",
+        "get_critical_gba_paths"
+      ],
       "effect": "可以查看未修正的violations及其原因，帮助定位和解决问题。可能需要更多资源或时间来生成报告。",
       "chunk_id": "_xtop_faq_v3_0059_0001"
     },
@@ -6608,11 +6474,26 @@
     },
     {
       "id": "kg_Operation_0165",
+      "class": "Operation",
+      "name": "解决工具因内存不足而挂起的问题",
+      "description": "该操作描述了当EDA工具（如XTop）在运行大规模设计时，因操作系统内存管理策略导致实际可用内存（Free Memory）不足而挂起（Hang）的解决方法。核心步骤是：1. 查看当前内存使用情况（free -m）；2. 联系系统管理员，通过调整内核参数来优化内存管理行为，包括临时增加系统预留的最小空闲内存（min_free_kbytes），降低交换倾向（vm.swappiness）；3. 建议配置高速的SSD硬盘作为交换空间（Swap）。",
+      "related_commands": [
+        "free -m",
+        "cat /proc/sys/vm/min_free_kbytes",
+        "sysctl -w vm.swappiness"
+      ],
       "effect": "增加swap空间，提升系统在内存不足时的性能，但可能增加SSD的磨损。",
       "chunk_id": "_xtop_faq_v3_0078_0001"
     },
     {
       "id": "kg_Operation_0166",
+      "class": "Operation",
+      "name": "替代exec命令获取时间",
+      "description": "该操作用于解决在XTop工具内部使用exec命令调用外部程序（如date）时，因系统内存或交换空间（swap）不足导致“无法fork子进程”的报错。解决方案是避免使用exec创建外部进程，转而使用XTop/Tcl内建的clock命令来获取和格式化当前时间。",
+      "related_commands": [
+        "clock seconds",
+        "clock format"
+      ],
       "effect": "设置Time变量为当前日期（格式为YYYYMMDD），但可能因系统内存不足导致fork子进程失败，出现错误。",
       "chunk_id": "_xtop_faq_v3_0079_0001"
     },
