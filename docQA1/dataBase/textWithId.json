@@ -29252,19 +29252,6 @@
       ]
     },
     {
-      "id": "kg_Command_0164",
-      "class": "Command",
-      "name": "指令名称",
-      "usage": "指令功能，描述这个命令做什么",
-      "syntax": "完整语法格式，包含所有选项和参数的占位符",
-      "arguments": [
-        "-arg1",
-        "...",
-        "scenarios"
-      ],
-      "chunk_id": "_xtop_handbook_0051_0001"
-    },
-    {
       "id": "kg_Command_0165",
       "class": "Command",
       "name": "_report_pin_raw_data",
@@ -29969,6 +29956,8 @@
     },
     {
       "id": "kg_Command_0181",
+      "class": "Command",
+      "name": "get_dont_touch_pins",
       "usage": "获取与指定模式匹配的dont touch pins",
       "syntax": "collection get_dont_touch_pins [-hierarchical] [-quiet] [ -regex | -exact ] [-nocase] [patterns]",
       "arguments": [
@@ -30941,6 +30930,8 @@
     },
     {
       "id": "kg_Command_0218",
+      "class": "Command",
+      "name": "report_annotated_timing_data",
       "usage": "报告注释的时序数据，包括单元、网络或引脚的时序信息，如建立时间、保持时间、电压降等，支持详细模式和过滤选项。",
       "syntax": "report_annotated_timing_data [-cells <cells>] [-nets <nets>] [-pins <pins>] [-verbose] [-include_skipped] [-truncate <number>]",
       "arguments": [
@@ -33013,6 +33004,8 @@
     },
     {
       "id": "kg_Command_0269",
+      "class": "Command",
+      "name": "mark_hold_path_pin_rank", 
       "usage": "设置引脚的排名类型以进行保持路径修复。",
       "syntax": "mark_hold_path_pin_rank -type rank_type [paths]",
       "arguments": [
@@ -33287,6 +33280,8 @@
     },
     {
       "id": "kg_Command_0273",
+      "class": "Command",
+      "name": "report_fail_reasons",
       "usage": "报告失败原因的统计信息，包括引脚或路径的失败原因分析",
       "syntax": "report_fail_reasons [-pins <pin_list>] [-paths <path_list>] [-methods <method_list>] [-stats] [-verbose] [-truncate <number>] [-disable_timing]",
       "arguments": [
@@ -33811,11 +33806,6 @@
         "_xtop_training_0117_0001",
         "_xtop_append_0009_0001"
       ]
-    },
-    {
-      "id": "kg_Command_0286",
-      "scenarios": "用于手动为特定的scenario设置setup extra derate，当需要覆盖自动设置或参数设置的默认值时使用。",
-      "chunk_id": "_xtop_faq_v3_0040_0001"
     },
     {
       "id": "kg_Command_0287",
@@ -34679,78 +34669,9 @@
       "chunk_id": "_xtop_training_0012_0001"
     },
     {
-      "id": "kg_Command_0323",
-      "usage": "报告设计层次结构，显示设计中的模块层级关系",
-      "syntax": "report_design_hierarchy [-hierarchy] [-level <level>] [-path <path>] [-filter <filter_expr>] [-sort <sort_key>] [-format <format>]",
-      "arguments": [
-        "-hierarchy",
-        "-level",
-        "-path",
-        "-filter",
-        "-sort",
-        "-format"
-      ],
-      "values": [
-        {
-          "usage": "指定要报告的层级",
-          "type": "int",
-          "optional": true,
-          "range": [
-            0,
-            1000
-          ],
-          "key_values": []
-        },
-        {
-          "usage": "指定路径表达式",
-          "type": "string",
-          "optional": true,
-          "range": null,
-          "key_values": []
-        },
-        {
-          "usage": "指定过滤器表达式",
-          "type": "string",
-          "optional": true,
-          "range": null,
-          "key_values": []
-        },
-        {
-          "usage": "指定排序键",
-          "type": "string",
-          "optional": true,
-          "range": null,
-          "key_values": []
-        },
-        {
-          "usage": "指定输出格式",
-          "type": "string",
-          "optional": true,
-          "range": null,
-          "key_values": [
-            {
-              "value": "text",
-              "usage": "以文本格式输出",
-              "scenarios": "需要在命令行或脚本中查看结果时使用"
-            },
-            {
-              "value": "xml",
-              "usage": "以XML格式输出",
-              "scenarios": "需要将结果导入其他工具或进行进一步处理时使用"
-            },
-            {
-              "value": "json",
-              "usage": "以JSON格式输出",
-              "scenarios": "需要将结果用于自动化脚本或与其他系统集成时使用"
-            }
-          ]
-        }
-      ],
-      "scenarios": "在需要查看或分析设计的模块层级关系时使用，例如在设计优化、调试或验证过程中",
-      "chunk_id": "_xtop_training_0019_0001"
-    },
-    {
       "id": "kg_Command_0324",
+      "class": "Command",
+      "name": "set_placement_constraint",
       "usage": "报告当前放置上下文的信息，如约束条件、布局参数等",
       "arguments": [
         "-max_displacement",
@@ -34813,6 +34734,8 @@
     },
     {
       "id": "kg_Command_0326",
+      "class": "Command",
+      "name": "set_parameter",
       "usage": "修复扇出违规，通过分割网络或插入缓冲器来满足最大扇出限制",
       "syntax": "fix_fanout_violations [-buffer {<buffer_cell>}] [-max_fanout <integer>] [-on_clock]",
       "arguments": [
@@ -35011,12 +34934,9 @@
       "chunk_id": "_xtop_training_0040_0001"
     },
     {
-      "id": "kg_Command_0331",
-      "scenarios": "用于在设计中插入缓冲器以解决时序问题，特别是在瓶颈分析表、路径视图或布局中右键点击引脚时使用。",
-      "chunk_id": "_xtop_training_0049_0001"
-    },
-    {
       "id": "kg_Command_0332",
+      "class": "Command",
+      "name": "insert_buffer",
       "usage": "插入缓冲器链以修复时序问题",
       "syntax": "insert_buffer -design <design_name> <cell_path> <buffer_list>",
       "arguments": [
@@ -35050,7 +34970,8 @@
     },
     {
       "id": "kg_Command_0333",
-      "command": "reconnect_pin",
+      "class": "Command",
+      "name": "reconnect_pin",
       "usage": "Reconnects a pin to a new driver in the clock tree, used for adjusting clock tree branches during ECO (Engineering Change Order) processes.",
       "syntax": "xtop> reconnect_pin -design {designName} {inputPinName} {netName}",
       "arguments": [
@@ -35081,11 +35002,6 @@
       ],
       "scenarios": "Used when adjusting clock tree branches during ECO processes, such as when modifying clock paths to resolve timing issues or optimize the clock tree structure.",
       "chunk_id": "_xtop_training_0057_0001"
-    },
-    {
-      "id": "kg_Command_0334",
-      "error": "未找到与指令 'write_design_changes' 相关的内容。",
-      "chunk_id": "_xtop_training_0067_0001"
     },
     {
       "id": "kg_Command_0335",
@@ -36400,13 +36316,6 @@
       "chunk_id": "_xtop_quickstart_0008_0001"
     },
     {
-      "id": "kg_Parameter_0037",
-      "content": [
-        0.0,
-        1.0
-      ]
-    },
-    {
       "id": "kg_Parameter_0038",
       "class": "Parameter",
       "name": "effort",
@@ -36617,7 +36526,7 @@
       "class": "Parameter",
       "name": "is_physical_hierarchical",
       "usage": null,
-      "type": "null",
+      "type": null,
       "range": null,
       "key_values": null,
       "scenarios": null,
@@ -37726,11 +37635,6 @@
       "chunk_id": "_xtop_handbook_0049_0001"
     },
     {
-      "id": "kg_Parameter_0099",
-      "scenarios": "当需要为特定模块实例设置自定义库文件时使用此参数，例如在不同工艺角或不同模块实例中使用不同的库文件。",
-      "chunk_id": "_xtop_handbook_0049_0001"
-    },
-    {
       "id": "kg_Parameter_0100",
       "class": "Parameter",
       "name": "file name with full path",
@@ -37968,13 +37872,6 @@
       "chunk_id": [
         "_xtop_handbook_0058_0001",
         "_xtop_faq_v3_0095_0001"
-      ]
-    },
-    {
-      "id": "kg_Parameter_0113",
-      "content": [
-        0,
-        100
       ]
     },
     {
@@ -39549,13 +39446,6 @@
       ]
     },
     {
-      "id": "kg_Parameter_0190",
-      "content": [
-        "_xtop_handbook_0237_0007",
-        "_xtop_handbook_0238_0008"
-      ]
-    },
-    {
       "id": "kg_Parameter_0191",
       "class": "Parameter",
       "name": "max_cluster_loader_count",
@@ -40428,19 +40318,12 @@
       "chunk_id": "_xtop_handbook_0314_0001"
     },
     {
-      "id": "kg_Parameter_0229",
-      "usage": "定义在修复保持、建立、电容违规时的电容松弛裕量，单位为pF。",
-      "scenarios": "在进行时序修复（如修复保持、建立、转换、电容违规）时，需要设置此参数以调整电容松弛裕量。",
-      "chunk_id": "_xtop_handbook_0315_0001"
-    },
-    {
       "id": "kg_Parameter_0230",
+      "class": "Parameter",
+      "name": "eco_capacitance_slack_target",
       "usage": "该参数用于定义在修复电容违规时的电容松弛目标值，单位为pF。",
       "type": "float",
-      "range": [
-        0,
-        null
-      ],
+      "range": null,
       "key_values": [
         {
           "value": "0.1",
@@ -40678,11 +40561,6 @@
       "chunk_id": "_xtop_faq_v3_0008_0001"
     },
     {
-      "id": "kg_Parameter_0242",
-      "scenarios": "当导入设计时需要控制是否进行布局调整，特别是在DEF文件不完整的情况下，需要根据是否进行Legal布局来设置此参数。",
-      "chunk_id": "_xtop_faq_v3_0010_0001"
-    },
-    {
       "id": "kg_Parameter_0243",
       "class": "Parameter",
       "name": "output_dir",
@@ -40747,6 +40625,7 @@
       "name": "swap_vt_only",
       "usage": "控制在leakage优化阶段是否仅进行电压阈值（VT）交换操作，而不进行其他类型的cell交换",
       "type": "boolean",
+      "range": null,
       "key_values": [
         {
           "value": "true",
@@ -40761,11 +40640,9 @@
           "scenarios": [
             "需要更全面的cell交换以优化时序或其他目标的场景"
           ]
-        },
-        "scenarios",
-        "在leakage优化阶段，当需要控制cell移动行为时，特别是在先进工艺下存在特殊VT规则约束的情况下，需要设置此参数",
-        "range(null)}"
+        }
       ],
+      "scenarios": "在leakage优化阶段，当需要控制cell移动行为时，特别是在先进工艺下存在特殊VT规则约束的情况下，需要设置此参数",
       "chunk_id": "_xtop_faq_v3_0053_0001"
     },
     {
@@ -41046,18 +40923,9 @@
       "chunk_id": "_xtop_training_0014_0001"
     },
     {
-      "id": "kg_Parameter_0262",
-      "class": "Parameter",
-      "name": "A",
-      "usage": null,
-      "type": null,
-      "range": null,
-      "key_values": null,
-      "scenarios": null,
-      "chunk_id": "_xtop_training_0014_0001"
-    },
-    {
       "id": "kg_Parameter_0263",
+      "class": "Parameter",
+      "name": "eco_max_buffer_chain_length",
       "usage": "控制在ECO缓冲器插入过程中允许的缓冲器链的最大长度",
       "type": "int",
       "range": [
@@ -41076,6 +40944,8 @@
     },
     {
       "id": "kg_Parameter_0264",
+      "class": "Parameter",
+      "name": "max_fanout",
       "usage": "Define the allowed maximum fanout for pins.",
       "type": "int",
       "range": [
@@ -41183,11 +41053,6 @@
       ],
       "scenarios": "在进行网络分割（split_net）操作时，需要设置此参数以确定分割规则",
       "chunk_id": "_xtop_training_0054_0001"
-    },
-    {
-      "id": "kg_Parameter_0269",
-      "error": "文档中没有提到eco_ga_auto_refill参数。",
-      "chunk_id": "_xtop_training_0074_0001"
     },
     {
       "id": "kg_Parameter_0270",
@@ -41333,11 +41198,6 @@
       "chunk_id": "_xtop_training_0097_0001"
     },
     {
-      "id": "kg_Parameter_0278",
-      "scenarios": "当需要在设计中交换不同类型的缓冲器（如正常缓冲器和延迟缓冲器）时，或者需要将具有特定通配符匹配的缓冲器分组进行统一处理时，需要设置eco_buffer_group参数。",
-      "chunk_id": "_xtop_training_0104_0001"
-    },
-    {
       "id": "kg_Parameter_0279",
       "class": "Parameter",
       "name": "moduleList",
@@ -41390,17 +41250,6 @@
         }
       ],
       "scenarios": "在需要控制特定操作或步骤的执行与否时使用此参数",
-      "chunk_id": "_xtop_training_0124_0001"
-    },
-    {
-      "id": "kg_Parameter_0283",
-      "class": "Parameter",
-      "name": "lib",
-      "usage": "参数功能，描述这个参数控制什么行为",
-      "type": null,
-      "range": null,
-      "key_values": null,
-      "scenarios": null,
       "chunk_id": "_xtop_training_0124_0001"
     },
     {
@@ -41511,12 +41360,6 @@
       "usage": "在合并ECO脚本时，工具不会更新时序信息，仅更新网表和布局合法性。相比其他模式，此模式下不进行时序更新，以提高合并ECO脚本的效率。",
       "scenarios": "当需要合并多个设计师并行生成的ECO脚本时，尤其是在大型复杂SoC设计中，多个子系统或不同设计师按时序类型独立工作时，应选择此模式。",
       "chunk_id": "_xtop_quickstart_0012_0001"
-    },
-    {
-      "id": "kg_Mode_0006",
-      "usage": "pro mode reduces memory consumption for large designs. It is not mentioned how it compares to other modes in terms of speed or precision.",
-      "scenarios": "when dealing with large designs where memory consumption is a concern.",
-      "chunk_id": "_xtop_release_0011_0001"
     },
     {
       "id": "kg_Mode_0007",
