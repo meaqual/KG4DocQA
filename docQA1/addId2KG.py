@@ -1,4 +1,3 @@
-# =======================addId2KG.py===========================
 import json
 from pathlib import Path
 
@@ -31,10 +30,19 @@ def add_ids_to_kg(input_path, output_path=None, id_prefix="kg"):
             # 生成顺序 ID
             item_id = f"{id_prefix}_{class_name}_{idx:04d}"
             
-            # 将 id 放在字典第一位
-            new_item = {"id": item_id}
-            new_item.update(item)
-            items[idx - 1] = new_item
+            # 直接在原字典中添加 id 字段
+            # 如果想让 id 在最前面，需要重建字典
+            if isinstance(item, dict):
+                # 将 id 放在字典第一位
+                new_item = {"id": item_id}
+                new_item.update(item)
+                items[idx - 1] = new_item
+            else:
+                # 如果 item 不是字典（比如是字符串），转换为字典格式
+                items[idx - 1] = {
+                    "id": item_id,
+                    "content": item
+                }
             
             total_count += 1
     
