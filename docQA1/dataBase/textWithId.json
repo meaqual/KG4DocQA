@@ -11223,6 +11223,7 @@
     },
     {
       "id": "kg_Argument_0035",
+      "class": "Argument",
       "name": "-prefix",
       "command": "write_incremental_sdf",
       "usage": "设置生成的SDF文件的前缀名称",
@@ -11403,14 +11404,6 @@
       ],
       "scenarios": "在需要限制路径终点层级时使用，例如分析特定模块内的信号路径或进行层级间的连接检查",
       "chunk_id": "_xtop_release_0010_0001"
-    },
-    {
-      "id": "kg_Argument_0041",
-      "usage": "需要调试的引脚列表",
-      "type": "string",
-      "optional": true,
-      "range": null,
-      "key_values": null
     },
     {
       "id": "kg_Argument_0042",
@@ -12307,10 +12300,10 @@
               "usage": "增大单元尺寸以修复违规",
               "scenarios": "当需要通过增大单元尺寸来解决时序问题时使用"
             }
-          ],
-          "scenarios": "在需要选择特定修复方法时使用，例如根据设计需求或约束选择不同的修复策略"
+          ]
         }
       ],
+      "scenarios": "在需要选择特定修复方法时使用，例如根据设计需求或约束选择不同的修复策略",
       "chunk_id": [
         "_xtop_ug_0044_0002"
       ]
@@ -12519,19 +12512,6 @@
         "_xtop_handbook_0258_0001",
         "_xtop_training_0038_0001",
         "_xtop_training_0039_0001"
-      ]
-    },
-    {
-      "id": "kg_Argument_0075",
-      "content": [
-        "fix_setup_gba_violations",
-        "fix_capacitance_violations",
-        "fix_setup_path_violations",
-        "eco",
-        "fix_transition_violations",
-        "eco_size_down",
-        "optimize_dynamic_power",
-        "optimize_design_area"
       ]
     },
     {
@@ -13034,13 +13014,6 @@
       ]
     },
     {
-      "id": "kg_Argument_0091",
-      "content": [
-        "fix_hold_gba_violations",
-        "fix_hold_path_violations"
-      ]
-    },
-    {
       "id": "kg_Argument_0092",
       "class": "Argument",
       "name": "-max_delay_cell_length",
@@ -13313,13 +13286,6 @@
       ]
     },
     {
-      "id": "kg_Argument_0099",
-      "content": [
-        "fix_wire_length_violations",
-        "fix_violations_by_clock_eco"
-      ]
-    },
-    {
       "id": "kg_Argument_0100",
       "class": "Argument",
       "name": "max_wire_length",
@@ -13501,13 +13467,6 @@
       ]
     },
     {
-      "id": "kg_Argument_0105",
-      "content": [
-        "optimize_leakage_power",
-        "optimize_dynamic_power"
-      ]
-    },
-    {
       "id": "kg_Argument_0106",
       "class": "Argument",
       "name": "remove_buffer_only",
@@ -13663,13 +13622,6 @@
       "chunk_id": [
         "_xtop_ug_0051_0001",
         "_xtop_handbook_0056_0002"
-      ]
-    },
-    {
-      "id": "kg_Argument_0113",
-      "content": [
-        -1000,
-        1000
       ]
     },
     {
@@ -13835,13 +13787,6 @@
       "values": null,
       "scenarios": "在需要处理脚本中可能出现的错误，同时希望继续执行后续命令的情况下使用此选项。例如，当脚本中有多个独立命令，某些命令可能失败但不影响其他命令的执行时。",
       "chunk_id": "_xtop_handbook_0009_0001"
-    },
-    {
-      "id": "kg_Argument_0124",
-      "content": [
-        "指定要评估的Tcl脚本文件",
-        "将命令的输出重定向到指定的文件中"
-      ]
     },
     {
       "id": "kg_Argument_0125",
@@ -14391,15 +14336,6 @@
       ]
     },
     {
-      "id": "kg_Argument_0147",
-      "content": [
-        "get_attribute",
-        "read_timing_report",
-        "set_setup_extra_derate",
-        "eco"
-      ]
-    },
-    {
       "id": "kg_Argument_0148",
       "class": "Argument",
       "name": "exact",
@@ -14684,13 +14620,6 @@
         "_xtop_handbook_0260_0002",
         "_xtop_handbook_0263_0001",
         "_xtop_training_0114_0001"
-      ]
-    },
-    {
-      "id": "kg_Argument_0158",
-      "content": [
-        "get_nets",
-        "get_dont_touch_nets"
       ]
     },
     {
@@ -15086,13 +15015,6 @@
       "chunk_id": "_xtop_handbook_0054_0001"
     },
     {
-      "id": "kg_Argument_0172",
-      "content": [
-        "all_fanin",
-        "move_cell"
-      ]
-    },
-    {
       "id": "kg_Argument_0173",
       "class": "Argument",
       "name": "endpoints_only",
@@ -15199,13 +15121,6 @@
       "values": null,
       "scenarios": "当用户不希望检查并报告单元与blockage之间的重叠时使用此选项。例如，仅关注单元之间的重叠问题。",
       "chunk_id": "_xtop_handbook_0063_0001"
-    },
-    {
-      "id": "kg_Argument_0179",
-      "content": [
-        "_xtop_handbook_0063_0001",
-        "_xtop_handbook_0064_0001"
-      ]
     },
     {
       "id": "kg_Argument_0180",
@@ -15374,16 +15289,6 @@
         "_xtop_handbook_0068_0001",
         "_xtop_handbook_0071_0001"
       ]
-    },
-    {
-      "id": "kg_Argument_0189",
-      "scenarios": "When comparing timing library cells across different process corners, use -source_corner to specify the source corner and -target_corner for the target corner.",
-      "chunk_id": "_xtop_handbook_0068_0001"
-    },
-    {
-      "id": "kg_Argument_0190",
-      "scenarios": "当需要比较不同corner（如典型、最坏情况）下的单元库时使用此选项，指定目标corner进行对比分析。",
-      "chunk_id": "_xtop_handbook_0068_0001"
     },
     {
       "id": "kg_Argument_0191",
@@ -15622,14 +15527,6 @@
       "chunk_id": "_xtop_handbook_0076_0001"
     },
     {
-      "id": "kg_Argument_0202",
-      "usage": "design_name参数用于指定当前操作所针对的设计",
-      "type": "string",
-      "optional": false,
-      "range": null,
-      "key_values": null
-    },
-    {
       "id": "kg_Argument_0203",
       "class": "Argument",
       "name": "enclosed",
@@ -15704,27 +15601,6 @@
       ],
       "scenarios": "当需要指定关键路径的中间点时使用此选项，例如在路径分析中需要关注某个特定中间节点的情况。",
       "chunk_id": "_xtop_handbook_0080_0001"
-    },
-    {
-      "id": "kg_Argument_0207",
-      "content": [
-        "get_dont_touch_cells",
-        "get_dont_touch_pins"
-      ]
-    },
-    {
-      "id": "kg_Argument_0208",
-      "content": [
-        "_xtop_handbook_0082_0001",
-        "_xtop_handbook_0083_0001"
-      ]
-    },
-    {
-      "id": "kg_Argument_0209",
-      "content": [
-        "_xtop_handbook_0089_0001",
-        "_xtop_handbook_0106_0001"
-      ]
     },
     {
       "id": "kg_Argument_0210",
@@ -16205,13 +16081,6 @@
       "chunk_id": "_xtop_handbook_0119_0001"
     },
     {
-      "id": "kg_Argument_0225",
-      "content": [
-        "link_reference_library",
-        "unlink_reference_library"
-      ]
-    },
-    {
       "id": "kg_Argument_0226",
       "class": "Argument",
       "name": "workspace_path",
@@ -16382,22 +16251,6 @@
       "syntax": "-include_skipped",
       "values": null,
       "scenarios": "当需要查看被跳过的注释时序数据时，例如在调试时序问题或进行详细分析时，应使用此选项。这在使用set_skip_scenarios命令后，需要确认跳过的场景数据时特别有用。",
-      "chunk_id": "_xtop_handbook_0134_0003"
-    },
-    {
-      "id": "kg_Argument_0236",
-      "class": "Argument",
-      "name": "-size_down_only",
-      "command": null,
-      "usage": null,
-      "syntax": null,
-      "values": null,
-      "scenarios": null,
-      "chunk_id": "_xtop_handbook_0134_0003"
-    },
-    {
-      "id": "kg_Argument_0237",
-      "error": "文档中没有找到与选项 -reorder 相关的内容。",
       "chunk_id": "_xtop_handbook_0134_0003"
     },
     {
@@ -16721,13 +16574,6 @@
       "values": null,
       "scenarios": "当需要筛选出链接失败的文件时使用此选项。",
       "chunk_id": "_xtop_handbook_0160_0001"
-    },
-    {
-      "id": "kg_Argument_0253",
-      "content": [
-        "save_workspace",
-        "reference"
-      ]
     },
     {
       "id": "kg_Argument_0254",
@@ -17729,6 +17575,7 @@
       "id": "kg_Argument_0286",
       "class": "Argument",
       "name": "location",
+      "command": null,
       "usage": "指定要调整大小的单元的位置。启用此选项后，工具将尝试将更改后的单元放置在指定的位置，如果布局合法化失败，则默认将其放置在指定位置并继续更新时序。",
       "syntax": "-location coord...",
       "values": [
@@ -17794,15 +17641,6 @@
       "chunk_id": [
         "_xtop_handbook_0197_0001",
         "_xtop_handbook_0198_0001"
-      ]
-    },
-    {
-      "id": "kg_Argument_0289",
-      "content": [
-        "_xtop_handbook_0197_0001",
-        "_xtop_handbook_0197_0001",
-        "_xtop_handbook_0198_0001",
-        "_xtop_handbook_0199_0001"
       ]
     },
     {
@@ -18491,10 +18329,6 @@
       "values": null,
       "scenarios": "When you need to include physical only cells in the leakage power statistics, use this option. By default, these cells are not included unless this option is specified.",
       "chunk_id": "_xtop_handbook_0219_0001"
-    },
-    {
-      "id": "kg_Argument_0326",
-      "content": []
     },
     {
       "id": "kg_Argument_0327",
@@ -19300,14 +19134,6 @@
       "chunk_id": "_xtop_handbook_0238_0001"
     },
     {
-      "id": "kg_Argument_0363",
-      "content": [
-        "fix_hold",
-        "fix_setup",
-        "report_fail_reasons"
-      ]
-    },
-    {
       "id": "kg_Argument_0364",
       "class": "Argument",
       "name": "-hold_target",
@@ -19658,10 +19484,6 @@
       ]
     },
     {
-      "id": "kg_Argument_0376",
-      "content": []
-    },
-    {
       "id": "kg_Argument_0377",
       "class": "Argument",
       "name": "swap_vt_only",
@@ -19952,6 +19774,7 @@
     },
     {
       "id": "kg_Argument_0393",
+      "class": "Argument",
       "command": "summarize_si_violations",
       "name": "-max_si",
       "usage": "设置SI违规的最大值阈值，用于筛选和汇总设计中超过该阈值的SI违规信息。",
@@ -20003,6 +19826,7 @@
     },
     {
       "id": "kg_Argument_0396",
+      "class": "Argument",
       "command": "report_fail_reasons",
       "name": "-paths",
       "usage": "指定要报告的路径列表，用于在优化过程中报告路径的失败原因。",
@@ -22378,11 +22202,6 @@
         "_xtop_handbook_0155_0002",
         "_xtop_handbook_0178_0001"
       ]
-    },
-    {
-      "id": "kg_Command_0039",
-      "error": "文档中没有关于write_design_changes指令的相关内容。",
-      "chunk_id": "_xtop_intro_0006_0001"
     },
     {
       "id": "kg_Command_0040",
@@ -25464,17 +25283,6 @@
       "chunk_id": "_xtop_release_0001_0001"
     },
     {
-      "id": "kg_Command_0074",
-      "class": "Command",
-      "name": "copy workspace safely enable linking timing library",
-      "usage": null,
-      "syntax": null,
-      "arguments": null,
-      "values": null,
-      "scenarios": null,
-      "chunk_id": "_xtop_release_0001_0001"
-    },
-    {
       "id": "kg_Command_0075",
       "class": "Command",
       "name": "dump SI data",
@@ -25856,17 +25664,6 @@
       ]
     },
     {
-      "id": "kg_Command_0086",
-      "class": "Command",
-      "name": "list eco action candidates",
-      "usage": null,
-      "syntax": null,
-      "arguments": [],
-      "values": [],
-      "scenarios": null,
-      "chunk_id": "_xtop_release_0006_0001"
-    },
-    {
       "id": "kg_Command_0087",
       "class": "Command",
       "name": "commit_candidate",
@@ -26060,17 +25857,6 @@
         "_xtop_ug_0039_0001",
         "_xtop_handbook_0202_0001"
       ]
-    },
-    {
-      "id": "kg_Command_0093",
-      "class": "Command",
-      "name": "set rail voltage for instances",
-      "usage": null,
-      "syntax": null,
-      "arguments": null,
-      "values": null,
-      "scenarios": null,
-      "chunk_id": "_xtop_release_0009_0001"
     },
     {
       "id": "kg_Command_0094",
@@ -27654,6 +27440,8 @@
     },
     {
       "id": "kg_Command_0119",
+      "class": "Command",
+      "name": "clock_eco_analysis",
       "usage": "用于分析通过修改时钟树来修复设置或保持时间违规的ECO（工程变更订单）影响，评估在多个场景下对设置/保持时间及时序裕量的影响。",
       "syntax": "clock_eco_analysis [-setup | -hold] [-decrease_delay] -buffer clock_buffer [-count buffer_count] [-trace_level trace_level | -target_pins target_pins] [-top count] [-include_begin_gain] [-detail] [-scenario reference_scenario] [-honor_dont_touch] [-setup_wns_threshold setup_wns_threshold] [-hold_wns_threshold hold_wns_threshold]",
       "arguments": [
@@ -29118,6 +28906,7 @@
     },
     {
       "id": "kg_Command_0154",
+      "class": "Command",
       "name": "all_registers",
       "usage": "Return a cell (or pin) collection of register cells.",
       "syntax": "all_registers [ -cells | {[-data_pins] [-clock_pins] [-async_pins] [-output_pins]}] [-no_hierarchy] [-level_sensitive] [-edge_triggered]",
