@@ -41383,14 +41383,6 @@
       ]
     },
     {
-      "id": "kg_Mode_0008",
-      "class": "Mode",
-      "name": null,
-      "usage": null,
-      "scenarios": null,
-      "chunk_id": "_xtop_ug_0020_0001"
-    },
-    {
       "id": "kg_Mode_0009",
       "class": "Mode",
       "name": "Post-mask ECO Mode",
@@ -41412,14 +41404,6 @@
         "_xtop_handbook_0144_0001",
         "_xtop_handbook_0175_0001"
       ]
-    },
-    {
-      "id": "kg_Mode_0011",
-      "class": "Mode",
-      "name": "worst",
-      "usage": null,
-      "scenarios": null,
-      "chunk_id": "_xtop_handbook_0073_0001"
     },
     {
       "id": "kg_Mode_0012",
@@ -41447,22 +41431,6 @@
       "name": "test",
       "usage": "该模式的特点未在文档中明确提及，无法提供具体信息。与其他模式的对比信息也未在文档中提供。",
       "scenarios": "该模式的适用场景未在文档中明确提及，无法提供具体信息。",
-      "chunk_id": "_xtop_handbook_0132_0001"
-    },
-    {
-      "id": "kg_Mode_0015",
-      "class": "Mode",
-      "name": "test_fast",
-      "usage": null,
-      "scenarios": null,
-      "chunk_id": "_xtop_handbook_0132_0001"
-    },
-    {
-      "id": "kg_Mode_0016",
-      "class": "Mode",
-      "name": "test_slow",
-      "usage": null,
-      "scenarios": null,
       "chunk_id": "_xtop_handbook_0132_0001"
     },
     {
@@ -41517,12 +41485,6 @@
       ]
     },
     {
-      "id": "kg_Mode_0023",
-      "usage": "Turbo Mode is designed for speed, using approximate algorithms to quickly fix setup and hold violations. It sacrifices some precision compared to other modes, but offers faster execution. It is suitable for scenarios where rapid iteration is needed, such as early-stage design exploration or when dealing with tight deadlines. Unlike the Precision Mode, which focuses on achieving the highest accuracy in slack calculations, Turbo Mode prioritizes speed, making it ideal for quick fixes and initial timing closure.",
-      "scenarios": "Turbo Mode is recommended for situations requiring fast timing closure, such as during early design stages, when quick fixes are needed, or when working under tight deadlines. It is particularly useful for scenarios where the exact precision of slack values is less critical than achieving a timely solution.",
-      "chunk_id": "_xtop_handbook_0264_0001"
-    },
-    {
       "id": "kg_Mode_0024",
       "class": "Mode",
       "name": "post mask mode",
@@ -41547,11 +41509,6 @@
       "chunk_id": "_xtop_faq_v3_0025_0001"
     },
     {
-      "id": "kg_Mode_0027",
-      "scenarios": "调试需要，如分析core文件、进程ID或逐步执行程序",
-      "chunk_id": "_xtop_faq_v3_0063_0001"
-    },
-    {
       "id": "kg_Mode_0028",
       "class": "Mode",
       "name": "postmask eco mode",
@@ -41560,33 +41517,12 @@
       "chunk_id": "_xtop_faq_v3_0086_0001"
     },
     {
-      "id": "kg_Mode_0029",
-      "usage": "模式特点，包括速度、内存、精度等方面的特性，以及与其他模式的对比",
-      "scenarios": "适用场景，什么情况下应该选择这个模式",
-      "chunk_id": "_xtop_training_0028_0001"
-    },
-    {
-      "id": "kg_Mode_0030",
-      "class": "Mode",
-      "name": null,
-      "usage": null,
-      "scenarios": null,
-      "chunk_id": "_xtop_training_0090_0001"
-    },
-    {
       "id": "kg_Mode_0031",
       "class": "Mode",
       "name": "eco_post_mask_mode",
       "usage": "该模式下，自动和手动ECO操作仅包含物理布线修改，避免任何布局调整。与其它模式相比，它专注于物理层调整而不改变布局，可能在速度和内存使用上更优，但精度可能受限于现有布局。",
       "scenarios": "当需要进行物理布线修改而无需调整布局时，例如插入缓冲器或进行门尺寸调整，应选择此模式。",
       "chunk_id": "_xtop_training_0094_0001"
-    },
-    {
-      "id": "kg_Mode_0032",
-      "usage": "该模式用于在后掩模阶段进行eco（工程变更）调整，主要涉及单元尺寸调整（sizing）和布局优化（legalization）。与其它模式（如eco buffer或filler）相比，post-mask eco更专注于在物理设计后期进行必要的调整以满足时序和物理约束，可能在速度和精度上有所权衡，但更适用于已接近完成的布局阶段。",
-      "scenarios": "当设计已进入后掩模阶段，需要进行最后的时序修复和物理调整，例如修复hold违规（fix_hold_gba_violations）时，应选择此模式。",
-      "error": "文档未明确提供模式名称（name）和模式特点（usage）的详细信息，导致无法完整填充字段。",
-      "chunk_id": "_xtop_training_0106_0001"
     }
   ],
   "Example": [
@@ -41729,6 +41665,9 @@
     },
     {
       "id": "kg_Example_0016",
+      "class": "Example",
+      "name": "xtop> mark_leakage_pin_rank –type leakageCount",
+      "usage": "演示mark_leakage_pin_rank优化漏电功耗功能",
       "scenarios": "这个示例适用于优化漏电功耗的场景，具体包括设置引脚的漏电功率排名权重类型为leakageCount，以考虑引脚的库单元漏电功率及其对其他引脚的影响。",
       "chunk_id": "_xtop_quickstart_0016_0001"
     },
@@ -41935,6 +41874,9 @@
     },
     {
       "id": "kg_Example_0040",
+      "class": "Example",
+      "name": "index_collection [get_pins ] 3",
+      "usage": "获取集合中的特定索引对象",
       "scenarios": "获取集合中的特定索引对象，例如获取某个集合的第三个元素",
       "chunk_id": "_xtop_handbook_0022_0001"
     },
@@ -41948,6 +41890,8 @@
     },
     {
       "id": "kg_Example_0042",
+      "class": "Example",
+      "name": "current_instance top/sub/sub_sub",
       "usage": "这个示例演示如何设置当前工作实例，以便在设计层次结构中进行相对操作。",
       "scenarios": [
         "需要在设计层次结构中导航时，例如进入特定的子模块进行操作",
@@ -41966,6 +41910,8 @@
     },
     {
       "id": "kg_Example_0044",
+      "class": "Example",
+      "name": "get_lib_cells -of_objects [get_cells -hierarchical] -filter is_pad_cell==true",
       "usage": "这个示例演示如何获取设计中使用的pad单元库单元",
       "scenarios": "这个示例适用于需要识别或筛选出设计中所有pad单元（如电源、地、I/O引脚等）的场景，例如在物理设计或约束设置时需要特别处理pad单元的情况。",
       "chunk_id": "_xtop_handbook_0033_0001"
@@ -42012,15 +41958,11 @@
     },
     {
       "id": "kg_Example_0050",
+      "class": "Example",
+      "name": "set_lib_per_instance {regs/dram1/C3} {_bc.lib} -corner fast",
       "usage": "设置指定模块实例（C3）在fast corner下使用_bc.lib库",
       "scenarios": "当需要为特定模块实例（如C3）在特定工艺角（如fast）下指定使用特定的库文件（如_bc.lib）时适用此场景",
       "chunk_id": "_xtop_handbook_0049_0001"
-    },
-    {
-      "id": "kg_Example_0051",
-      "usage": "设置指定单元的最高工况下的轨电压为0.88V",
-      "scenarios": "在需要为特定单元（I_PCS3）设置最大工况下的轨电压时使用，例如在电源完整性分析或电压降分析中",
-      "chunk_id": "_xtop_handbook_0050_0001"
     },
     {
       "id": "kg_Example_0052",
@@ -42074,6 +42016,8 @@
     },
     {
       "id": "kg_Example_0058",
+      "class": "Example",
+      "name": "% create_scenario func_worst -corner worst -mode func -temperature 105",
       "usage": "这个示例演示如何创建一个名为'worst'的corner",
       "scenarios": "这个示例适用于需要为设计创建特定corner的场景，例如在EDA流程中设置不同的工艺角进行仿真或验证",
       "chunk_id": "_xtop_handbook_0070_0001"
@@ -42320,6 +42264,8 @@
     },
     {
       "id": "kg_Example_0088",
+      "class": "Example",
+      "name": "report_dropped_scenarios",
       "usage": "这个示例演示如何报告被丢弃的场景",
       "scenarios": "这个示例适用于在调用reduce_scenario命令后需要检查哪些场景被丢弃的情况",
       "chunk_id": "_xtop_handbook_0142_0001"
@@ -42923,6 +42869,8 @@
     },
     {
       "id": "kg_Example_0163",
+      "class": "Example",
+      "name": "refine_gba_timing",
       "usage": "refine_gba_timing",
       "scenarios": "improve timing data accuracy and delete all timing path for more efficient timing optimization",
       "chunk_id": "_xtop_handbook_0259_0001"
@@ -43273,6 +43221,8 @@
     },
     {
       "id": "kg_Example_0207",
+      "class": "Example",
+      "name": "xtop > set_setup_extra_derate -scenario {func_slow} 1.1",
       "usage": "手动对某一个scenario单独设置setup extra derate",
       "scenarios": null,
       "chunk_id": "_xtop_faq_v3_0040_0001"
@@ -43367,11 +43317,6 @@
       "usage": "设置特定cell在placement阶段的间距规则，等同于设置placement halo",
       "scenarios": "需要为特定master cell定义特殊spacing rule，如via pillar等设计约束的场景",
       "chunk_id": "_xtop_faq_v3_0096_0001"
-    },
-    {
-      "id": "kg_Example_0219",
-      "scenarios": "适用于需要准备设计数据的场景，例如在物理实现工具中设置设计数据以供XTop使用。",
-      "chunk_id": "_xtop_training_0005_0001"
     },
     {
       "id": "kg_Example_0220",
@@ -43543,32 +43488,32 @@
     },
     {
       "id": "kg_Example_0240",
+      "class": "Example",
+      "name": "xtop > fix_violations_by_clock_eco -buffer CKBUFF1 -setup -trace_level 4",
       "usage": "这个示例演示如何通过时钟ECO自动修复设置违规，并使用跟踪级别4进行详细分析。",
       "scenarios": "这个示例适用于需要详细分析时钟ECO修复路径的场景，例如在复杂设计中定位和解决设置时间违规问题。",
       "chunk_id": "_xtop_training_0028_0001"
     },
     {
       "id": "kg_Example_0241",
+      "class": "Example",
+      "name": "xtop > fix_violations_by_clock_eco -buffer CKBUFF1 -setup -gain_ratio 30 -auto_scan",
       "usage": "该示例演示如何通过指定缓冲器CKBUFF1和-gain_ratio 30参数以及-auto_scan选项来自动修复设置时间违规，选择总增益最佳的解决方案",
       "scenarios": "适用于需要自动修复时序违规且希望选择增益最佳的解决方案的场景，特别是在设置时间违规的情况下，当手动调整缓冲器数量和增益比时",
       "chunk_id": "_xtop_training_0028_0001"
     },
     {
-      "id": "kg_Example_0242",
-      "scenarios": "这个示例适用于什么场景",
-      "usage": "这个示例演示什么功能",
-      "name": "示例代码或命令内容，与原文完全一样",
-      "class": "Example",
-      "chunk_id": "_xtop_training_0030_0001"
-    },
-    {
       "id": "kg_Example_0243",
+      "class": "Example",
+      "name": "xtop > fix_transition_violations -buffer_list {BUFX2 BUFX4 ...} -transition_target 0.02",
       "usage": "使用缓冲器列表BUFX2、BUFX4等来修复转换违规，并设置转换目标为0.02",
       "scenarios": "适用于需要通过插入特定缓冲器来修复时序转换违规的场景，特别是在需要控制转换时间和电容裕量的情况下",
       "chunk_id": "_xtop_training_0030_0001"
     },
     {
       "id": "kg_Example_0244",
+      "class": "Example",
+      "name": "xtop > fix_wire_length_violations -buffer {BUFD2} -max_wire_lenth 2000 -on_clock",
       "usage": "设置最大布线长度为2000微米，用于后续的布线长度违规修复操作",
       "scenarios": "适用于需要限制布线长度以避免信号延迟过长或物理布线困难的场景，例如高速信号传输或高密度布线设计",
       "chunk_id": "_xtop_training_0033_0001"
@@ -43669,10 +43614,7 @@
       "class": "Example",
       "name": "xtop > write_design_changes -format <PR> -eco_file_prefix {xxx}",
       "usage": "输出逻辑和物理设计更改到文件，生成包含ECO操作的脚本文件",
-      "scenarios": [
-        "适用于需要导出设计更改的场景，如split_net操作后生成ECO脚本",
-        "适用于需要将ECO操作保存为原子命令的场景，例如使用-force选项处理跨层次操作时"
-      ],
+      "scenarios":"适用于需要导出设计更改的场景，如split_net操作后生成ECO脚本以及需要将ECO操作保存为原子命令的场景，例如使用-force选项处理跨层次操作时",
       "chunk_id": "_xtop_training_0061_0001"
     },
     {
@@ -43701,6 +43643,8 @@
     },
     {
       "id": "kg_Example_0260",
+      "class": "Example",
+      "name": "xtop > summarize_fanout_violations -threshold 16 -r2r_only",
       "usage": "这个示例演示如何使用summarize_fanout_violations命令，通过指定阈值（-threshold 16）和仅分析寄存器到寄存器路径（-r2r_only）来汇总设计中的扇出违规信息。",
       "scenarios": "该示例适用于需要分析寄存器到寄存器路径中的扇出违规情况，且阈值设置为16的设计场景，例如在数字电路设计中进行时序分析和优化时。",
       "chunk_id": "_xtop_training_0077_0001"
