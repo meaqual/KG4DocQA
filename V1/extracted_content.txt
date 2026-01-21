@@ -1,0 +1,2121 @@
+_xtop_handbook_0155_0001
+Arguments
+interpolated from parameter eco_voltage_setup_extra_derate with priority. Only one cell is allowed to be reported at one time.
+
+-scenario scenario_pattern Patterns to match scenarios.
+
+Description
+Option -scenario is to determine which scenarios to be reported, if not specified, derate of all scenarios will be reported.
+
+_xtop_faq_v3_0030_0001
+# 2 MMMC和Timing Data
+Q7：read_timing_data 导入数据后反标率很低，可能的原因有哪些？ 
+A： 
+1. 首先应对所有输入数据进行检查，检查给xtop 的verilog 文件是否与sta 工具吃的是同一个文件 
+2. 检查一下在read_timing_data 时是否有添加option "-memory_saving_mode",以及从STA 工具dump timing data 时，是否source 了turbo mode 脚本，当前XTop中的turbo/pro mode，会对这些pin 的clock 信息及些不必要的attribute 进行reduce，在这两个mode 中，dump 数据时只会dump violation pin 及vio pin 前后3-5 级的pin info，所以可能会导致反标率(annotated ratio)的下降，目前XTop 是当反标率(annotated ratio)低于90%以下时，工具会中止继续进行eco，针对这种情况，建议使用normal mode dump数据，或使用turbo mode dump 数据时，添加option "-include_tran_vio"和"-include_cap_vio".
+
+_xtop_append_0006_0001
+在XTop工具中进行timing fix check时，使用的license的数量基于max_thread_number和scenario两者的最大值N的对数：licenses = log2(N)   
+特殊地，leakage优化还会需要额外check一个license，所以：
+2个scenario的leakage优化需要1+1个license；
+8个scenario的leakage优化需要3+1个license。
+
+_xtop_faq_v3_0004_0001
+# 1 Import Design
+Q4: 如何确定design 所链接的LEF 文件是正确的？ 
+A: link_reference_library 之后，可以运行report_reference_library_file_status 命令
+进行检查作为reference  library 的LEF 文件状态。例如： 
+xtop > report_reference_library_file_status 
+/.../tutorial/input_files/lef/tutorial.lef : succeeded 
+  Warnings : 1 
+Warning(line: 674-734)  : Cumulative Antenna ratios already set with different value.
+
+_xtop_ug_0044_0002
+# Chapter 4. Optimize Design
+## Automatic ECO
+### Fix Setup and Hold Violations
+Fix Setup and Hold Violations 
+Following are the corresponding commands to fix setup and hold violations. For 
+detail, please query the handbook or with command man in XTop. 
+ 
+xtop> fix_setup_gba_violations 
+SYNOPSIS 
+  int fix_setup_gba_violations 
+    [-buffer_list buffer_names] 
+    [-remove_buffer_only] 
+    [-methods method_list] 
+    [-size_rule rule_type] 
+    [-dff_only 
+     | -size_down_only] 
+    [-setup_target slack_val] 
+    [-hold_margin margin_val] 
+    [-transition_margin margin_val] 
+    [-rel_transition_margin rel_margin_val] 
+    [-capacitance_margin margin_val] 
+    [-effort effort_level] 
+    [-group] 
+    [-priority_weight type_name] 
+ [-summarize_internal_iteration] 
+    [-disable_report] 
+    [-only_pins pin_list 
+     | violations] 
+    [-debug_pins pin_list] 
+ 
+xtop> fix_setup_path_violations 
+SYNOPSIS 
+  int fix_setup_path_violations 
+    [-buffer_list buffer_names] 
+    [-remove_buffer_only] 
+    [-methods method_list] 
+    [-size_rule rule_type] 
+    [-dff_only 
+     | -size_down_only] 
+    [-setup_target slack_val] 
+    [-hold_margin margin_val] 
+    [-transition_margin margin_val] 
+    [-rel_transition_margin rel_margin_val] 
+    [-capacitance_margin margin_val] 
+    [-only pins pin list] 
+    [ debug_pins pin_list] 
+    [-effort effort_level] 
+    [-priority_weight type_name] 
+    [-summarize_internal_iteration] 
+    [-disable_report] 
+    [paths] 
+ 
+xtop> fix_hold_path_violations 
+SYNOPSIS 
+  int fix_hold_path_violations 
+    [-buffer_list buffer_names] 
+    [-size_cell_only 
+     [-size_rule rule_type] 
+     [-dff_only]] 
+    [-hold_target slack_val] 
+    [-setup_margin margin_val] 
+    [-transition_margin margin_val] 
+    [-rel_transition_margin rel_margin_val] 
+    [-capacitance_margin margin_val] 
+    [-only_pins pin_list] 
+    [-debug_pins pin_list] 
+    [-effort effort_level] 
+    [-summarize_internal_iteration] 
+    [-disable_report] 
+    [-max_cluster_loader_count max_count] 
+    [-fix_timing_window] 
+    [-use_dummy_cell 
+     [-dummy_only]] 
+    [-max_delay_cell_length max_delay_cell_len 
+     -delay_cell_list delay_cell_names] 
+    [paths] 
+ 
+xtop> fix_hold_gba_violations 
+SYNOPSIS 
+  int fix_hold_gba_violations 
+    [-buffer_list buffer_names] 
+    [-size_cell_only 
+     [-size_rule rule_type] 
+     [-dff_only]] 
+    [-hold_target slack_val] 
+    [-setup_margin margin_val] 
+    [-transition_margin margin_val] 
+    [-rel_transition_margin rel_margin_val] 
+    [-capacitance_margin margin_val] 
+    [-effort effort_level] 
+    [-group] 
+    [-summarize_internal_iteration] 
+    [-disable_report] 
+    [-max_cluster_loader_count max_count] 
+    [-fix_timing_window] 
+    [-use_dummy_cell 
+     [-dummy_only]] 
+    [-max_delay_cell_length max_delay_cell_len 
+     -delay_cell_list delay_cell_names] 
+    [-only_pins pin_list 
+     | violations] 
+[-debug_pins pin_list]
+
+_xtop_handbook_0335_0001
+Parameters
+
+Name
+eco_post_mask_mode --Enable post mask mode for eco actions.
+
+Type
+type: bool
+
+Default
+default = "false"
+
+Description
+While this parameter is set to true, buffer insertion and cell sizing will be acting in post mask mode which
+only contains physical wire modification and avoid any placement adjustment.
+
+Examples
+The following example shows how to use spare cells to fix timing in post mask mode.
+
+% set_parameter eco_post_mask_mode true
+% set_parameter eco_buffer_list_for_hold  {AN2 OR2 BUF2}
+% set_parameter eco_buffer_list_for_setup {AN2 OR2 BUF2}
+% fix_setup/hold_gba_violations ...
+      
+
+The following example shows how to use GA cells to fix timing in post mask mode.
+
+% set_parameter eco_post_mask_mode true
+% set_parameter eco_ga_site {GCORE}
+% set_parameter eco_ga_filler_list {GAFILLER1 GAFILLER2}
+% set_parameter eco_buffer_list_for_hold  {GBUFFD1BWP12T GBUFFD3BWP12T}
+% set_parameter eco_buffer_list_for_setup {GBUFFD1BWP12T GBUFFD3BWP12T}
+% fix_setup/hold_gba_violations ...
+      
+
+Or run as following.
+
+% set_parameter eco_post_mask_mode true
+% set_parameter eco_ga_name_patterns {GAFILL* GBUFF*}
+% set_parameter eco_ga_filler_list {GAFILLER1 GAFILLER2}
+% set_parameter eco_buffer_list_for_hold  {GBUFFD1BWP12T GBUFFD3BWP12T}
+% set_parameter eco_buffer_list_for_setup {GBUFFD1BWP12T GBUFFD3BWP12T}
+% fix_setup/hold_gba_violations ...
+      
+
+See Also
+eco_ga_site eco_ga_filler_list
+
+453
+
+_xtop_faq_v3_0083_0001
+# 6 General Usage
+
+Q10: 为什么XTop 计算的Leakage power 跟P*T 对不上？ 
+A:  
+首先leakage power 的计算与state 强相关，cell 工作在不同的state 
+condition 下会呈现不同的leakage power value 
+⚫ STA leakage power 计算行为： 
+在STA 中，一个cell 的leakage power 的计算极其复杂，他与state 
+probability 强相关，大致计算方法为： 
+1. 对于一个4 输入的combination cell 来说，它的state 可能为2
+4，
+共16 种condition，如下表 
+A1 	A2 	B1 	B2 
+1 	1 	1 	1 
+1 	1 	1 	0 
+1 	1 	0 	1 
+1 	1 	0 	0 
+1 	0 	1 	1 
+1 	0 	1 	0 
+1 	0 	0 	1 
+1 	0 	0 	0 
+0 	1 	1 	1 
+0 	1 	1 	0 
+0 	1 	0 	1 
+0 	1 	0 	0 
+0 	0 	1 	1 
+0 	0 	1 	0 
+0 	0 	0 	1 
+0 	0 	0 	0 
+ 
+2. 在STA 工具中会分别计算上述16 种状态下的leakage power value，
+并与其对应的state probability 相乘，即每一个condition 的
+leakage power 为： 
+state （cell leakage power） = leakage power value * state 
+probability 
+3. 根据上式中的计算结果，将16 中state 下的leakage power 相加，
+最后获得该cell 在当前design 中的leakage power。 
+ 
+⚫ XTop leakage power 计算行为： 
+首先因当前XTop 中的大部分pin attribute 及cell attribute 均使用dump
+脚本得来，
+但对于state probability 这一指标，
+在P*T 中并没有相关attribute
+能够使用脚本进行dump，故当前XTop 中的leakage power 计算方法无法做到与
+P*T 中完全一致，但总体leakage power 的变化趋势可以做到与P*T 中一致。 
+1. 因无法像P*T 中一样对一个cell 进行by state 的leakage power 的精
+准计算，故当前XTop 中的leakage 评估较为粗糙 
+2. 在进行cell swap 时，
+工具会选择一个更高阈值电压的cell进行leakage 
+power 评估，目前只会粗糙的取遇到的第一个state，作为该cell 的
+leakage power 进行比较
+
+_xtop_append_0004_0001
+XTop工具支持读取net和cell两种类型的aocv文件。对于cell的aocv文件，会正常读入。对于net的aocv文件，可以bypass的读入，不会报错，但是也不会从这个文件中取值。
+
+_xtop_handbook_0326_0001
+Parameters
+
+Name
+eco_ga_filler_list --Gate array fillers used in post mask eco.
+
+Type
+type: string_list
+
+Default
+default = ""
+
+Description
+This parameter specifies the gate array fillers used to insert buffer or size cell in post mask eco. These gate
+array fillers must have gate array site or match gate array name patterns. And gate array filler1 cell MUST
+be included in this list to guarantee the refilling. Also, Multi-height gate array fillers are supported.
+
+Examples
+The following example shows how to set the parameter:
+
+% set_parameter eco_ga_filler_list {GFILL1 GFILL2 GFILL3 GFILL1_2X GFILL2_2X GFILL3_2X}
+      
+
+See Also
+eco_ga_site
+
+444
+
+_xtop_faq_0005_0001
+XTop FAQ
+
+Q14：为什么summarize结果和第三方工具差的很多，identify_io_path_pins怎么用？
+A：	如果发现XTop 用summarize_gba_violations -io_only或者-r2r_only，分类报告的数目和第三方工具report差距较大，可能是由于 I/O pin的认定不同所导致。
+
+XTop里识别IO pins的做法有两个：
+1. 读sta_data下面的ilm文件（老版本）
+2. 通过指令identify_io_path_pins（新版本）。
+具体来说，如果读取ilm文件，由于ilm文件是通过脚本从PT里抓出来的，可见这个文件本身就不能和PT自己的report_global_timing一致。如果执行命令identify_io_path_pins，在执行后XTop内部自己识别IO pins，取消从ilm文件读入的结果，且不可逆。会把IO pins分为几个部分：
+	从output ports向前trace所有的fanin，那么这些fanin和ports都是IO pins，对应io->io, reg->io
+	对于input port，工具会从input port向后trace fanout，跳过组合逻辑单元，直到FF endpoints。如果遇到组合逻辑单元是非buf/inv的多输入单元 (例如：A1, A2, Y)，还需要从FF1再向前反向trace所有fanin ，如果从A2的fanin向前没找到FF，则从input port到A1到Y到FF1上的点会标记为I/O pins；如果找到 IN—A1—FF1, FF2—A2—FF1，那么从Y到FF1这一段公共部分不会标记I/O pins。 这部分对应io->reg
+
+注：推荐读入timing path来校准结果，工具会把io->io, reg->io, io->reg的I/O pin 起止的timing path上的点都累加标记为I/O pin，这样identify的结果会比较准。
+
+_xtop_faq_v3_0053_0001
+# 4 ECO时序优化
+Q12：当前XTop 中在leakage opt 阶段，swap cell 的行为是怎
+样的，是否会挪动cell？ 
+A： 
+首先在在legal 阶段是否会挪动cell，与是否only_swap_cell 无关，只与
+当时的placement constraint 有关，如果用户设置了： 
+xtop > set_placement_constraint  -max_displacement {0 0} 
+ 
+则工具将不会挪动cell，
+否则即使在opt leakage 阶段，
+就算使用了option 
+-swap_vt_only ，工具也可能在某些特殊的vt rule （先进工艺下，因
+double/triple pattern 制造工艺，
+会存在同一类型cell 的LVT 和HVT 的出pin
+位置不一致或底层metal 不在同一color 上）的要求下，轻微的挪动cell，但
+这种挪动cell 的幅度很小，基本在1-20 个site 之间。
+
+_xtop_release_0007_0001
+XTop Release Notes
+Release Note: 2020.06.sp1
+* New Features
+1. Added GUI for clock eco analysis.
+2. Added -auto_scan option for fix_violations_by_clock_eco.
+3. Added license wait feature.
+* Enhancements
+1. Fixed crash when report dont use before creating corners.
+2. Fixed crash when open GUI after remove_buffer action.
+3. Fixed crash when import power domain, if power domain element is empty.
+4. Enhanced the max_transition gain check for size_cell.
+5. Enhanced expanding MIB pins when fix transition with pin collection.
+6. Added Gain_Ratio value display for clock_eco_analysis result.
+7. Adjusted fail reason report in post-mask eco flow for no GA cell found.
+8. Fixed a bug of cell overlap by post-mask eco method.
+9. Added a parameter "eco_ga_cell_sizing_rule" to allow sizing between GA and non-GA cells in post-mask eco.
+10. Added a parameter "eco_allow_optimize_heavy_fanout_net" to allow DRC fix for nets with more than 128 fanouts.
+11. Fixed a bug that leakage power fix would break setup timing for multi-fanout nets.
+12. Fixed a bug that lots of buffers inserted to fix transition, if transition target/margin is not correct.
+13. Fixed a bug that write_design_changes result in NATIVE format cannot be re-loaded.
+14. Fixed bugs of legalization due to cell symmetry and multiple row cell.
+
+_xtop_quickstart_0001_0001
+XTop Quick Start
+
+Post-Mask ECO
+When user finds timing violation in the very late stage of design, he may not want to change the mask to clean the timing. Post-mask ECO can help to do small changes to fix timing violations, by buffer insertion and cell sizing methods. It will only contain physical wire modification and avoid any placement adjustment in the layout.
+In XTop, please set the parameter eco_post_mask_mode to enable the post-mask eco mode.
+XTop can support both Spare Cell flow and GA Filler flow.
+
+_xtop_quickstart_0018_0001
+Write SDF: Example
+Please run write SDF command after read timing data command.
+To speed up the process of read timing data command, “-ignore_data_for_sdf” option can be used. In this case, only GBA pin slack and used as clock data file will be read. Cell delay will be calculated using FO4 model, which may be different from the actual delay.
+```
+xtop> source design_setup.tcl
+xtop> source mcmm.tcl
+xtop> read_timing_data -data_dir ...
+xtop> write_incremental_sdf -dir result -hold -target 0.02
+
+#using -ignore_data_for_sdf to speed up
+xtop> source design_setup.tcl
+xtop> source mcmm.tcl
+xtop> read_timing_data -data_dir ...  -ignore_data_for_sdf
+xtop> write_incremental_sdf -dir result	-setup \
+-reserved_cell_delay_percentage 0.6
+
+```
+
+_xtop_faq_v3_0033_0001
+# 3 Parameter参数
+Q1：don't_touch 设置在cell/pin/net/path 上有什么区别？ 
+A： don't_touch 可以设置在cell, net, pin, path 和library cell 等对象上。 
+    这里的pin 有些特殊，
+因为它们代表连接关系，
+并不是design 中真实的objects，
+只是用来控制工具在优化过程中的扫描点，基于debug 的目的。 
+⚫ 对于cell/net，
+如果设定了don't_touch，
+就不会在相应的单元/线网上做eco 动
+作。 
+⚫ 对于library cell，
+don't_touch 意味着库中的所有该单元的实例，
+都don't_touch
+了。 
+⚫ 对于pin，如果设定了don't_touch，在时序优化的扫描过程中就会跳过这个
+点。 （譬如，后果是不会在它上插buffer 的） 
+⚫ 对于path，如果设定了don't_touch，在扫描过程中就会跳过path 上的所有
+pin。 
+另外，需要注意： 
+set_module_dont_touch $ref_name       
+相当于把该ref_name 对应的module 内部所有的cell，net 和pin 都dont touch 
+set_hier_path_dont_touch $hier_path    
+相当于把该hier_path 下所有的cell，net 和pin 都dont touch 了； 
+在hierarchy pin 上设dont_touch 无效（它并不是实体，不参与扫描）； 
+在hierarchy net 上设dont_touch 有效（它对应着top net 实体）。
+
+_xtop_append_0001_0001
+Xtop工具的优化模式特点
+1. Normal Mode: 
+1) 基础的优化模式，数据导入速度和优化速度相对比较慢，但是读取数据不会有精度损失。
+
+2. Turbo Mode：
+1) Turbo Mode主要对导入数据的规模进行了优化，减少了获取的数据量，从而加速XTop数据文件导入的过程，减少内存损耗；
+2) 读取数据方面，Turbo Mode与Normal Mode的输入文件本身是一致的，但由于Turbo Mode读取输入文件时具体拿取的数据与Normal Mode存在不同，导致读取数据会有一定的精度损失，但Turbo Mode和Pro Mode在数据需求、数据拿取、数据精度方面完全一致；
+3) 提升优化速度，减少大型设计的内存损耗。
+
+3. Pro Mode：
+1) Pro Mode和Turbo Mode在除内存损耗以外的各项特性上基本相同，两者在输入文件、数据需求、数据拿取、数据精度、优化速度等方面基本无差别，因此，两者与Normal Mode相比都会有一定精度损失；
+2) Pro Mode与Turbo Mode唯一的不同点是在内存上的具体损耗有所不同。
+
+注意事项
+1) 当用户在Normal Mode下使用read_timing_data命令拿取数据时，如果使用了-memory_saving_mode选项，则会相当于切换到了Pro Mode，造成数据读取的精度损失。
+
+_xtop_faq_v3_0049_0001
+# 4 ECO时序优化
+Q8: XTop 中单元的leakage 值是怎么取的？ 
+A:  
+1. 200825 版本之前，取cell leakage 中worst 值； 
+2. 200825 版本之后，对定义了primary power pin 的lib cell ，取
+related_power_pin 为primary power pin 的leakage 均值；对没有定义
+primary power pin 的lib cell，取该cell 所有leakage 的均值； 
+3. Fix_leakage 时，
+leakage 值取自reference corner lib，
+因此如果leakage 
+trend 在不同corner 下不一致，
+reference corner 的选取可能导致替换cell
+的数量不同； 
+例如： 
+ 
+如果default reference corner 由于channel 11 leakage> channel 8 leakage，
+ 
+keywords 设置为
+“8P57PDSVT 11P57PDSVT”
+导致大量no_alternative_cell fail 
+reason； 
+切换
+reference corner ，leakage
+变为
+channel 8>channel 11 ，
+no_alternative_cell fail reason 大量减少。
+
+_xtop_quickstart_0002_0001
+Post-Mask ECO: Spare Cell Flow
+What is “Spare Cell”? It can be defined by following conditions:
+Spare cell is not a physical-only cell (like filler cell).
+All inputs of the space cell (except for the clock pin) are unconnected or tie_HIGH/tie_LOW. 
+The clock pin of the spare cell can be connected to the clock network.
+All outputs of the spare cell are unconnected.
+
+For the spare cell flow, it just likes the usual eco flow, after enabling the post mask mode. 
+The below is an example.
+
+Please note:
+- fix_fanout_violations, fix_wire_length_violations and optimize_design_area commands are not supported in post mask mode. 
+- only insert_buffer and size_cell methods are supported in post mask mode.
+- in the buffer list parameter, not only allows buffer and inverter, but also support AND and OR cell.
+Currently, NAND, NOR and XOR cell are not supported.
+
+_xtop_faq_v3_0097_0001
+# 7 Appendix
+Q6：为什么有时候在XTop 里man 会不工作？ 
+A：正常情况下，xtop 的manual 均能够正常打开并查询，当遇到无法工作的情
+况，建议首先确认，xtop 当前运行下的机器资源，mem 及cpu 情况，以及确认
+xtop job 的提交方式是否为bsub 方式，bsub 方式在某些特殊情况下，无法开启
+交互模式，有可能存在这种问题，需与客户IT 进行确认，如果在local 机器下
+依然无法man command，请直接联系PE/RD
+
+_xtop_handbook_0308_0001
+Parameters
+
+Name
+eco_allow_optimize_heavy_fanout_net --Allow auto optimization for heavy fanout net.
+
+Type
+type: bool
+
+Default
+default = "false"
+
+Description
+By default, heavy fanout net is not allowed to be touched during auto optimization. When this parameter
+is set true, it is allowed to do eco actions on such net. But user should be sure that timing is not an issue.
+
+This parameter is only effective for DRC fix for now.
+
+Examples
+The following example shows how to enable the parameter:
+
+% set_parameter eco_allow_optimize_heavy_fanout_net true
+      
+
+426
+
+_xtop_handbook_0260_0001
+Arguments
+-disable_timing Not to output the timing information.
+
+-exclude_reasons reason_list Reasons not to report in statistical summary, matched by wildcard.
+
+-methods method_list The methods to report fail reason, all if not specified.
+
+-stats Report statistical of fail reasons.
+
+-truncate num Count limitation of the number of pins or paths to report, default is 100, zero or negative value means all.
+
+-verbose Report the pins for each fail reason.
+
+Description
+This command reports fail reason on pins of the optimization process. If the violation on pin can not be fixed, commonly a reason will be marked for each tried method. If the pin has been fixed successfully, or has no violation at all, it will be marked with "-".
+
+Since it can only mark one reason for one method of each pin, it can only report the reason of the last tried candidate. For example, if ten alternative cells tried for one cell and all failed, only the reason of the last one can be reported. It is possible that no reason is marked, if the pin has solution but not completely fixed, or the violation is caused by fix process.
+
+_xtop_faq_v3_0047_0001
+# 4 ECO时序优化
+Q6: buffer 应该怎么选？ 
+A:  
+1. 对于Setup fix，要尽量选择不同驱动能力的buffers，且在不同驱动能力的buffers中选择那些max_delay尽量小的buffer。
+可以按照以下步骤操作：
+1) 先通过以下指令生成buffer.rpt文件
+```
+xtop> summarize_buffers [get_lib_cell *BUFFD*] >buffer.rpt 
+```
+2) 在生成的buffer.rpt文件中，选择按照驱动能力大小排序。然后在各驱动能力group中挑选一个max delay最小的buffer（尽量不要选D0和D24及以上的单元） 
+
+2. 对于Hold fix，要尽量选择min_delay值不同的buffers，且在这些buffers中选择max_delay值尽量小的buffer。
+可以按照以下步骤操作：
+1) 先通过以下指令生成buffer.rpt文件
+```
+xtop> summarize_buffers [get_lib_cell  “*BUFFD* *DEL*”] >buffer.rpt 
+```
+2) 对于生成的buffer.rpt文件，其可以按照多种标准进行排序：
+1	min delay
+2	max delay/min delay 的比值
+3	area
+4	leakage power
+
+这里我们选择按照min delay大小排序，然后在各min delay group中挑选一个max delay最小的buffer：
+For min delays between 10-30ps:  2ps range for each bin 
+For min delays between 30-50ps:  4ps range for each bin 
+For min delays between 50-100ps:  8ps range for each bin 
+For min delays between 100-200ps:  16ps range for each bin 
+For min delays between 200-300ps:  32ps range for each bin 
+For min delays between 300-500ps:  64ps range for each bin 
+
+3. 对于Leakage Power Opt 
+ 
+![D4 buffer单元分析结果的示意图](resources/images/_xtop_faq_v3/img_page0034_fig0001.png)
+
+上图分析了D4 的几种buffer 单元，可以按照下列顺序去做leakage power
+ 
+优化： 
+#Start ULVT swapping 
+optimize_leakage_power -setup_margin 0.01 -transition_margin 0.03 \ 
+        -keywords {"16P96CPDULVT" "20P96CPDULVT" "24P96CPDULVT"} -dff_only 
+optimize_leakage_power -setup_margin 0.01 -transition_margin 0.03 \ 
+        -keywords {"16P96CPDULVT" "20P96CPDULVT" "24P96CPDULVT"} 
+#Start LVT swapping 
+optimize_leakage_power -setup_margin 0.01 -transition_margin 0.03 \ 
+        -keywords {"16P96CPDLVT" "20P96CPDLVT" "24P96CPDLVT"} -dff_only 
+optimize_leakage_power -setup_margin 0.01 -transition_margin 0.03 \ 
+        -keywords {"16P96CPDLVT" "20P96CPDLVT" "24P96CPDLVT"} 
+#Start final swapping 
+optimize_leakage_power -setup_margin 0.01 -transition_margin 0.03 -dff_only 
+optimize_leakage_power -setup_margin 0.01 -transition_margin 0.03
+
+_xtop_handbook_0216_0001
+Arguments
+-exclude_path Do not take the slack of path into account.
+
+-hold Report the hold timing.
+
+-setup Report the setup timing.
+
+-with_distribution Print a slack distribution histogram.
+
+pin_list Pins to summarize.
+
+Description
+This command summarizes the timing violations of global based analysis. It will output the violation count, worst slack, total negative slack. While there exists paths through one pin, the worst slack of paths is preferred unless option -exclude_path is specified.
+
+While pins are specified, it will only take the endpoints that is in the pin list into account.
+
+_xtop_handbook_0170_0001
+Commands
+
+Name
+set_module_dont_touch --Set all objects in module dont touch or not.
+
+Synopsis
+set_module_dont_touch module_list [value]
+
+string_list module_list
+
+bool value
+
+Arguments
+module_list Modules to be set as dont touch or not.
+
+value Dont touch or not, default is true.
+
+Description
+This command set the specified module dont touch or not. It has the same effect of setting all the cells and
+nets in all instances of the specified modules in the design recursively dont touch.
+
+If you want to set dont touch for whole design, just specify top design name.
+
+Examples
+The following example sets all of the cells and nets in instances of module dram as dont touch:
+
+% set_module_dont_touch dram
+      
+
+The following example remove the objects in specified module from dont touch.
+
+% set_module_dont_touch dram 0
+      
+
+See Also
+set_dont_touch set_hier_path_dont_touch is_dont_touch save_user_dont_touch
+restore_user_dont_touch get_dont_touch_cells get_dont_touch_nets get_dont_touch_pins
+
+207
+
+_xtop_ug_0053_0001
+# Chapter 4. Optimize Design
+## Automatic ECO
+### Post-mask ECO
+Post-mask ECO 
+Please set the parameter eco_post_mask_mode to enable the post-mask eco mode. In 
+late stage of design, user may not want to change the mask to clean the timing. Post-
+mask ECO can help to do small changes to fix timing violations, by buffer insertion 
+and cell sizing methods. It will only contain physical wire modification and avoid any 
+placement adjustment in the layout. Post-mask ECO supports spare cell flow and ga filler flow, and both flow supports manual eco and auto eco.
+
+#### Spare Cell Flow
+For the spare cell flow, it just likes the usual eco flow, after enabling the post mask 
+mode.  
+ 
+xtop> set_parameter  eco_post_mask_mode true 
+ 
+##### for manual eco 
+xtop> insert_buffer -design {regs} {dram1/C3/U574/C1} 
+{OR4D0BWP12THVT} 
+xtop> size_cell -design {DIU_MDI_0_test_1} {HDMIFF/U13} {CKBD8BWP12T} 
+ 
+##### for auto eco 
+xtop  set_parameter eco_buffer_list_for_hold  {AN2 OR2 BUF2 INV2} 
+xtop> set_parameter eco_buffer_list_for_setup {AN2 OR2 BUF2} 
+xtop> fix_setup/hold_gba_violation ...   
+
+#### GA filler Cell Flow
+For the GA filler flow, please specify the parameter eco_ga_site or 
+eco_ga_name_pattern first. IMPORTANT NOTE: If both GA site and name pattern are defined, eco_ga_site will have the higher priority. In the optimization, XTop will delete the GA filler cells, 
+and insert the new cells given, and use the GA filler cells to fill the blank space.  
+ 
+xtop> set_parameter eco_post_mask_mode true 
+xtop> set_parameter eco_ga_site {gacore12T} 
+xtop> set_parameter eco_ga_name_patterns {GFILL* GBUFF* GAN*} 
+xtop> set_parameter eco_ga_filler_list {GFILL1BWP12T GFILL2BWP12T 
+GFILL4BWP12T} 
+ 
+##### for manual eco 
+xtop> insert_buffer -design {regs} {dram1/xtop_cell_0/I} 
+{GBUFFD1BWP12T} \ 
+      -locations {(190.200, 94.800)} size_cell \ 
+      -design {cpu} {dram_t2/C3/U392} {GMUX2ND1BWP12THVT} 
+ 
+##### for auto eco 
+xtop> set_parameter eco_buffer_list_for_hold  \ 
+           {GBUFFD1BWP12T GBUFFD4BWP12T GBUFFD8BWP12T} 
+xtop> set_parameter eco_buffer_list_for_setup \ 
+           {GBUFFD1BWP12T GBUFFD4BWP12T GBUFFD8BWP12T} 
+xtop> fix_setup/hold_gba_violations ...
+
+#### Please note:
+ only insert_buffer and size_cell methods are supported in post mask mode.
+More notes for the two different flows: 
+For spare cell flow:
+- fix_fanout_violations, fix_wire_length_violations and optimize_design_area commands are not supported in post mask mode.
+- in the buffer list parameter, not only allows buffer and inverter, but also support AND and OR cell.Currently, NAND, NOR and XOR cell are not supported.
+
+For GA filler cell flow:
+- Parameter placement_legalization_mode is not working in post mask mode.
+- Supported cells include: buffer/inverter/and/or .
+- By default, only allow sizing from GA cells to GA cells. In 2020.06.sp1 or later, if user wants to size between GA cell and non-GA cells, please set parameter eco_ga_cell_sizing_rule to complete.
+
+_xtop_handbook_0412_0001
+Fail Reasons
+
+Name
+no_setup_margin --No setup margin at current pin.
+
+Description
+No setup margin on current pin. This is reported in fixing hold. Once the setup slack is non-positive of
+any scenario, this reason will be marked and the pin is skipped. It can be relaxed by specifying a negative
+setup margin.
+
+See Also
+eco_setup_slack_margin
+
+531
+
+_xtop_append_0005_0001
+在XTop工具中，如果将path的endpoint设为don't touch，那么整条path都会变为don't touch。因为电路里一条path的时序，前面变了肯定会影响后面的，所以如果想要endpoint保持don't touch，则需要endpoint之前的所有点都保持don't touch，也即整条path都为don't touch。
+
+_xtop_faq_v3_0082_0001
+# 6 General Usage
+Q9：在write_design_changes 时，工具报错："Error: Current 
+ECO action may create new logical port"时，应如何继续？ 
+A： 
+导致该问题主要是因为当前eco action 中，有部分操作存在跨hierarchy
+的现象，需要创建logical port/pin，针对这种情况，有两种办法可以解决： 
+1. write_design_changes -write_atomic_command 
+这种方式将把所有的命令全部写出为atomic 命令，用来适配logical 
+port/pin 的创建 
+2. write_design_changes -force 
+这种方式还是写出macro 命令，只是在需要创建logical port/pin 时，
+将会转换为atomic 命令 
+Note：
+因该方法写出的eco 命令中包含了marco 和atomic 命令，
+pr tool
+再吃回该脚本时，
+可能会因为marco 和atomic mode 来回切换而导致runtime
+过长，如出现上述频繁切换的情况，可在write_eco_action 时添加option 
+-reorder，
+该option 将会把所有atomic 命令全部放至最后进行source，
+减
+少因mode 频繁切换导致的runtime 增加 
+ 
+在CUI mode 下,因不同版本的pr tool 中crate logical port/pin 的命令
+前后存在着区别，所以建议在写出时，添加option -version，来控制写出
+的命令的适配版本，当-version value 大于21.1 时，会输出create_hport
+命令。为了兼容之前的输出，version 默认值暂时设为0.0，请各位AE 同事
+在使用前，提前确认好客户当前pr tool 的版本。
+
+_xtop_faq_v3_0052_0001
+# 4 ECO时序优化
+Q11：ECO 阶段如何进行多线程加速，当前XTop 中在哪些
+eco 阶段和方法中可以进行多线程加速？ 
+A： 
+在ECO 阶段使用多线程进行加速，目前工具仅支持对combination cell 
+进行多线程的sizing，当前已支持多线程的命令有： 
+xtop > fix_setup_gba_violations  -enable_multithread 
+xtop > fix_setup_path_violations  -enable_multithread 
+xtop > optimize_leakage_power  -enable_multithread 
+xtop > optimize_dynamic_power  -enable_multithread 
+xtop > optimize_ir_drop  -enable_multithread 
+ 
+Note: 这里的thread 数目受max_thread_number 这个parameter 控制,如此
+时max_thread_number 为32，则意为着工具在进行comb cell sizing 时，
+会尝试同时对32 个相互之间无timing 联系的vio point 同步进行cell 
+sizing。
+
+_xtop_faq_v3_0012_0001
+# 1 Import Design
+Q12：当design 中的工艺和设定的techlef 不匹配有什么命令可
+以检查呢？ 
+A： 
+当tlef 和design 工艺不匹配时，主要会出现两种情况，可分别通过下面三种
+方式进行定位： 
+① site name 仅在tlef 中进行了定义，没有在cell lef 中定义，且tlef 中定
+义的site name 与cell lef 中调用的site name 不一致： 
+当出现以上情况时，工具在import design 阶段就会报出site “xxx” in desig
+n “xxx” not found in tech 的error message 进行提示，如下图： 
+
+![error message示意图](resources/images/_xtop_faq_v3/img_page0015_fig0002.png) 
+
+② site name 仅在tlef 中进行了定义，没有在cell lef 中定义，但此时cell
+ lef 中所调用的site name 与tlef 中的一致，但高度不同： 
+当出现以上情况时，工具在design setup 阶段不会报出来异常，需在eco 动作前，使用命令check_placement_readiness 进行检查，此时工具会报出
+大量的"Row and its site are not matched"相关error，如下图： 
+
+![Row and its site are not matched相关error示意图](resources/images/_xtop_faq_v3/img_page0016_fig0001.png) 
+
+③ site name 在tlef 和cell lef 中均有定义，仅有tlef 中的layer 与design 中
+不一致： 
+当出现以上情况时，工具在design setup 阶段不会报出来异常，需在eco
+动作前，使用命令report_design_file_status 进行检查，此时工具会报出相关
+layer was not found，可根据此信息反向定位tlef 问题，如下图：
+
+![layer was not found示意图](resources/images/_xtop_faq_v3/img_page0016_fig0002.png)
+
+_xtop_handbook_0240_0008
+Arguments
+-size_down_only Only size down off-path no violation comb cell, to optimize setup timing.
+
+Description
+-size_down_only allows user to size down no violation off-path combinational cells, so that total capacitance of net is decreased, which is good to setup timing.
+
+_xtop_handbook_0256_0001
+Arguments
+-capacitance_margin margin_val Capacitance slack margin to be reserved with unit pF, use
+
+eco_capacitance_slack_margin if not specified.
+
+-debug_pins pin_list XTop will print more debug log for specified pins, and abort fix once all these pins have been scanned.
+
+-dff_only Only size down dff cells when set. If not specified, only size down comb cells.
+
+-hold_margin margin_val Hold slack margin to be reserved with unit ns, use eco_hold_slack_margin if not specified.
+
+-pattern str Pattern for sizing down cell, use eco_cell_nominal_sizing_pattern if not specified.
+
+-rel_transition_margin Relative transition slack margin to be reserved with rel_margin_val the value of percentage to max transition, use
+
+eco_relative_transition_slack_margin if not specified, a sum of transition_margin and rel_transition_margin will be actually used.
+
+-remove_buffer_only Remove buffer only.
+
+-setup_margin margin_val Setup slack margin to be reserved with unit ns, use eco_setup_slack_margin if not specified.
+
+-transition_margin margin_val Transition slack margin to be reserved with unit ns, use eco_transition_slack_margin if not specified.
+
+Description
+This command optimizes area of the design by removing buffer or sizing down cells without introducing any timing and design rule violations. While sizing down, it finds the candidates according to the specified nominal sizing pattern.
+
+This command returns the number of solutions committed. If you want to allow breaking setup after optimization, you can set the setup margin to a negative value.
+
+_xtop_handbook_0225_0002
+Arguments
+-force Force to write out macro commands and only the illegal ones are written in atomic format.
+
+-reorder Put the forced output commands at the end of the output sequence.
+
+-write_atomic_cmd Write out atomic commands for each action.
+
+Description
+By default, macro commands will be output. However, it will report errors when following happens:
+--Buffered pins are not in the same logic hierarchy when insert buffer or split net.
+--Split net with inverter.
+--Insert individual inverter when insert buffer chain.
+--Insert AND/OR cell as buffer in post-mask eco.
+
+In these cases, please write out atomic eco commands instead of macro commands with option -write_atomic_cmd. Or force to dump the macro commands with option -force. Here if -force option is used, atomic commands (which can be run by source command) will be dumped only for these particular actions. The atomic commands will be mixed with other macro commands. For some specific reasons, if these mixed commands are not convenient, please use -reorder option to put all the atomic commands at the end of the output sequence.
+
+_xtop_handbook_0239_0004
+Arguments
+-size_down_only Only size down off-path no violation comb cell, to optimize setup timing.
+
+Description
+-size_down_only allows user to size down no violation off-path combinational cells, so that total capacitance of net is decreased, which is good to setup timing.
+
+_xtop_append_0003_0001
+Q: Pro Mode都能优化哪些时序违规？
+A: Pro Mode支持修复setup, hold, transition, max_cap等违规。
+
+_xtop_faq_v3_0040_0001
+# 3 Parameter参数
+Q8：如果同时设置了scenario_setup_extra_derate 和
+setup_extra_derate，以哪个为准？ 
+A： 
+当前XTop 中共有三种方式设置extra setup derate： 
+1. parameter ：eco_auto_setup_extra_derate 
+当设置了此parameter 为true 时，XTop 将自动进行检测，如果通过tlef
+或lef 文件发现当中具有7nm/5nm 相关联的标识rule，且存在有corner 对应
+的电压在0.7v 以下，工具将自动调整该corner 的derate 为1.05，同时，在进
+行leakage opt 时，工具将自动调整该corner 的derate 为1.02，具体为什么要
+调整为1.05 和1.02，通过历史bug 追踪，看到这是某些7nm/5nm 的工艺要
+求，暂时还不完全理解为什么需要这样设置 
+2. command ：set_setup_extra_derate 
+通过该命令，可手动的对某一个scenario 单独设置setup extra derate，
+derate value range 为[1-1.2],具体用法如下： 
+xtop > set_setup_extra_derate -scenario {func_slow} 1.1 
+ 
+3. parameter ：eco_voltage_setup_extra_derate 
+该参数可以允许用户设置多组voltage-derate pairs，
+当遇到某一个未定义
+derate 的voltage corner 时，工具将会根据这些pairs 进行线性插值，如： 
+xtop > set_parameter eco_voltage_setup_extra_derate {(0.55, 1.20) (0.65, 1.15) (0.75, 1.05)} 
+ 
+根据以上pairs 设置，当遇到actual voltage 为0.6 时，工具将会自动调整
+该电压corner 下derate 为1.175 
+以上三种设置extra setup derate 的方式，在优先级上： 
+3 > 2 > 1,即优先级最低的是parameter eco_auto_setup_extra_derate，如果用命
+令设了set_setup_extra_derate 则会follow 该命令的value，如果同时还设了
+eco_voltage_setup_extra_derate，则该parameter 具有最高优先级。
+
+_xtop_debug_0011_0001
+XTop Debug方法介绍
+
+summarize path
+由于精度问题，脚本dump的timing report里可能存在一些slack = 0.0000的path，
+这类path在summarize时可能不会加在violation count里（只统计<0），就会存在get_path和summarize_path数量不一致的情况，可以忽略。
+
+_xtop_faq_v3_0028_0001
+# 2 MMMC和Timing Data
+Q5: 为什么XTop 在读入timing data 之后报告timing clean？ 
+A：  
+1. 请先检查从STA 写出的timing data 是否正确。 
+有些时候，用户只dump block data in top STA，使用了-only_hier_path
+的选项。
+（可以检查写出的timing data 文件的头部，
+会标明design 和current 
+inst 名称： 
+**************************************** 
+Design   : cpu 
+... 
+Current_instance : 
+ 
+2. 检查一下从STA 写出的timing data 是否和netlist 匹配。工具会打印出运
+行read_timing_data 命令后的反标率。
+如果小于95%，
+用户就需要检查一下
+是否给定netlist 与之不匹配。 
+xtop> read_timing_data -data_dir ../input_files/sta_data 
+... 
+Success : 100.0% pins and 97.7% nets have annotated data.
+
+_xtop_quickstart_0003_0001
+Post-Mask ECO: GA Filler Flow
+For the GA filler flow, user must set parameters in one of the three ways: 1. set eco_ga_site and eco_ga_filler_list. 2. set eco_ga_name_pattern and eco_ga_filler_list. 3. set eco_ga_site, eco_ga_name_pattern and eco_ga_filler_list (in this case, eco_ga_site has higher priority than eco_ga_name_pattern).
+In specific, the parameters are:
+eco_ga_site		to specify the site of GA cells (higher priority than eco_ga_name_pattern).
+eco_ga_name_pattern	name patterns used by gate array cells (lower priority than eco_ga_site, only in 2020.06.sp1 or later).
+eco_ga_filler_list	to set gate array filler cells, for buffer insertion and sizing. (It must include the minimum GA filler (filler1). Otherwise, it will error out)
+
+(in 2020.06.sp1 or later, it will auto-traverse all GA cells, and get the greatest common divisor of all cell widths, which require the minimum GA filler must be included in the filler list.)
+(in 2021.09 or later, it will check the given GA filler cells, guarantee existing filler cell for each VT/channel length (by eco_cell_nominal_swap_keywords).)
+eco_cell_nominal_swap_keywords		in 2021.09 or later, used to identify the VT/channel length
+	
+In the optimization, XTop will delete the GA filler cells, and insert the new cells given, and use the GA filler cells to fill the blank space. The below is an example.
+
+Please note:
+- Only insert_buffer and size_cell methods are supported in post mask mode.
+- Parameter placement_legalization_mode is not working in post mask mode.
+- Supported cells include: buffer/inverter/and/or .
+- By default, only allow sizing from GA cells to GA cells. In 2020.06.sp1 or later, if user wants to size between GA cell and non-GA cells, please set parameter eco_ga_cell_sizing_rule to complete.
+
+_xtop_handbook_0345_0001
+Parameters
+
+Name
+eco_size_cell_drive_strength_weaken_ratio --When size down, cell drive strength get worse, the value
+is the threshold for selecting candidate cells.
+
+Type
+type: float "[0.1,1)"
+
+Default
+default = "0.4"
+
+Description
+When size down cell, cell's drive strength decreases, SI or transition evaluation may be inaccurate in some
+cases. This parameter defines a ratio to original cell's drive strength as threshold, to adjust the selection of
+candidate cells. Cells whose drive strength is weaker than the threshold will be abandoned, while tool will
+continue to try other stronger ones as usual. If the ratio is set smaller, more sizing down will be allowed
+in result.
+
+Only effective for sizing down, in fix hold, or setup, optimize power and optimize design area.
+
+Examples
+The following example shows how to change the ratio.
+
+% set_parameter eco_size_cell_drive_strength_weaken_ratio 0.3
+      
+
+463
+
+_xtop_ug_0024_0001
+# Chapter 3. Manage Workspace
+## Workspace Settings
+### Dont Touch
+Dont Touch 
+If one object (cell, net, pin, path) is set dont touch, it means it will not be modified 
+during optimization process. For path, it means that tools will not try to fix the 
+violations on that path.  
+Use command get_dont_touch_cells, get_dont_touch_nets, get_dont_touch_pins to 
+get those objects. Use command is_dont_touch to return if it is dont touch.  
+xtop> set_dont_touch object_list [true|false]
+
+_xtop_faq_0002_0001
+XTop FAQ
+
+Q6：5nm工艺，针对fix hold及leakage优化的setup derate如何设置比较合适？
+A：对于5nm工艺，相关的参数有`set_setup_extra_derate`, `pocvm_logic_depth_scale_factor`和`pocv_cell_delay_factor_transition_sigma`。
+为了保护setup 时序和精度，这些参数可以通过手动或者自动的办法设置。
+1. 手动设置时，通常按照下面的设置来收敛：
+···
+xtop > set_setup_extra_derate -scenario .*024_F2.* 1.14	#低压corner, 0.55V
+xtop > set pocvm_logic_depth_scale_factor 0.5			#POCV 的logic depth
+xtop > set pocv_cell_delay_factor_transition_sigma 1.5		#如果有OCV sigma transitio
+···
+2. 自动设置时，需要设置parameter eco_auto_setup_extra_derate 为true，XTop 将自动进行检测，如果通过tlef
+或lef 文件发现当中具有7nm/5nm 相关联的标识rule，且存在有corner 对应
+的电压在0.7v 以下，工具将自动调整该corner 的derate 为1.05，同时，在进
+行leakage opt 时，工具将自动调整该corner 的derate 为1.02，具体为什么要
+调整为1.05 和1.02，通过历史bug 追踪，看到这是某些7nm/5nm 的工艺要
+求，暂时还不完全理解为什么需要这样设置
+
+_xtop_handbook_0166_0001
+Commands
+
+Name
+set_dont_touch --Set the specified dont touch or not.
+
+Synopsis
+set_dont_touch object_list [value]
+
+collection object_list
+
+bool value
+
+Arguments
+object_list Objects to be set as dont touch or not.
+
+value Dont touch or not, default is true.
+
+Description
+This command set the specified objects dont touch or not in the design to prevent them to be modified
+during optimization process.
+
+The objects can be cells, nets, pins, paths and library cells. It is a little special for pins since they are not
+real objects in designs. It is used to control the scanning process in optimization for purpose of debugging.
+
+In XTop, only the top net can represent the physical net. All the logical net segments specified will be
+converted to top level automatically.
+
+For paths, it means that the tool does NOT try to fix the violations on the path. So, only the pins on the
+specified paths are set as dont touch.
+
+Once a library cell is set as dont touch, it means that all the cell instances with this library cell are dont
+touch.
+
+Examples
+The following example sets cells matched add_* as dont touch:
+
+% set_dont_touch [get_cells add_*]
+      
+
+The following example sets pins on Path_0 as dont touch:
+
+% set_dont_touch [get_paths -path_name Path_0]
+      
+
+The following example remove pins on Path_0 from dont touch:
+
+% set_dont_touch [get_paths -path_name Path_0] 0
+      
+
+The following example sets instances with the library cell matched *BUF* as dont touch:
+
+% set_dont_touch [get_lib_cells *BUF*]  
+      
+
+See Also
+set_module_dont_touch set_hier_path_dont_touch is_dont_touch get_dont_touch_cells
+get_dont_touch_nets get_dont_touch_pins save_user_dont_touch restore_user_dont_touch
+
+203
+
+_xtop_debug_0003_0001
+XTop Debug方法介绍
+
+Fail Reason的标注原则
+fail reason原则上是try的最后一个candidates上产生的reason，但某些情况也会做调整，不完全精确，但参考分布还是可以的。有一个特殊情况会是在fix path的时候，XTop会把修不好的path上的clock pin标记为used_as_clock。
+
+如果没有fail reason，一般有以下4种情况：
+1. 不是reference pin，
+2. 因为某些原因不在扫描范围内，比如clock/特殊的点， 
+3. run了多轮被清掉了（可以参考俊葳写的FAQ文档： xtop_fail_reason.docx）， 
+4. 已经是best solution，但仍然修不好。
+
+_xtop_append_0002_0001
+Q: Turbo Mode都能优化哪些时序违规？
+A: Turbo Mode支持修复setup, hold, transition, max_cap等违规。
+
+_xtop_handbook_0041_0001
+Commands
+
+Name
+read_aocv --To read aocv file for given scenario.
+
+Synopsis
+read_aocv -scenario sce aocv_files
+
+string scenario
+
+string_list aocv_files
+
+Arguments
+-scenario sce Which scenario to read aocv files.
+
+aocv_files Aocv files to be read.
+
+Description
+This command is used to read aocv file.
+
+Examples
+The following example shows how to read aocv files for given scenario.
+
+% read_aocv -scenario func_setup { setup_func.aocvm}
+    
+
+50
+
+_xtop_handbook_0309_0001
+Parameters
+
+Name
+eco_auto_setup_extra_derate --Allow auto set setup_extra_derate and pocvm_logic_depth_scale_factor.
+
+Type
+type: bool
+
+Default
+default = "false"
+
+Description
+When it is set to true, for hold fix, when the process is 5nm/7nm and voltage of corresponding corner
+is less than 0.7v, set_setup_extra_derate will be automatically set to 1.05. If pocv enabled, when the process
+is 5nm/7nm and there is one corner voltage less than 0.7v, pocvm_logic_depth_scale_factor will be
+automatically set to 0.5.
+
+When it is set to true, for leakage optimization, set_setup_extra_derate will be automatically set to 1.02.
+
+Please note, when those two parameters are manually set by user, the automatic setting will be invalid.
+
+Examples
+The following example shows how to set the parameter:
+
+% set_parameter eco_auto_setup_extra_derate false
+      
+
+427
+
+_xtop_release_0002_0001
+XTop Release Notes
+Release Note: 2022.06.sp1
+* New Features
+None.
+* Enhancements
+1. Added setup and hold constraint attributes for timing_path objects.
+2. Added parameter control to skip building logic depth.
+3. Relaxed the max displacement constraint of new eco instance to 1000t.
+4. Supported to honor dont_use when post-mask eco cell refill.
+5. Added command get_tmlib_cell_property to return delay, transition attributes of cell.
+6. Added parameter control to size cells between different physical_variant types.
+7. Fixed a crash when split_net in MIB design.
+8. Fixed a crash when clock eco solution committed in MIB design.
+9. Fixed a crash when dumping the timing data file of clock root info.
+10. Fixed a crash when read_timing_data due to legalizer initialization.
+11. Fixed a crash when summarize_inst_displacement.
+12. Fixed a crash when buffer removal in manual eco.
+13. Fixed a bug that result not updated after fix_glitch_violation.
+14. Fixed a bug that get_pins command changed the collection to string.
+15. Fixed a bug that readiness_check_level value could not be saved for set_placement_constraint.
+16. Fixed a bug that append_to_collection command could not append objects.
+17. Fixed a bug that power domain conflict reported when merging eco scripts.
+18. Fixed a bug that WNS became worse when fixing Setup timing using buffer insertion.
+19. Fixed a bug that setup paths could not be dumped from 3rd party tools.
+* Known Issues
+None.
+
+_xtop_release_0003_0001
+XTop Release Notes
+Release Note: 2022.06
+* New Features
+1. Supported corner reduction to filter TopN worst scenarios.
+2. Supported downsizing to fix Setup timing.
+3. Supported mixed heights GA filler for post-mask ECO.
+4. Supported to output Verilog and incr. DEF result.
+5. Supported to hack SDF for post-simulation.
+6. Supported pba2gba timing calibration.
+7. Supported to merge multiple ECO scripts.
+* Enhancements
+1. GUI Enhancements.
+2. Added set_highlight_color command.
+3. Supported snapshot in Layout viewer.
+4. Supported to highlight all eco cells in path view.
+5. Supported to highlight multiple timing paths.
+6. Enhanced MIB, add parameter eco_copy_mib_timing_data to duplicate RC info.
+7. Enhanced flow, support “xtop -f script.tcl | & tee xtop.log” usage.
+8. Added -pretend option for "read_timing_report" to support reading in parallel.
+9. Enhanced DEF parsing, support REGION constraint without type.
+10. Supported physical variant cell defined in special library.
+11. Enhanced “check_placement_readiness”, report site mismatch between tech LEF and DEF.
+12. Added a new command “report_design_hierarchy”.
+13. Enhanced the scenario report which includes nets with no annotated data.
+14. Enhanced leakage optimization speed, for ccs lib having macros with many output pins.
+15. Enhanced data preparation for Turbo mode, support to dump cap information.
+16. Enhanced script for Turbo mode to dump timing info of preferred hier_paths or module boundaries.
+17. Added -hier_path option for “set_specific_lib_cells”, support setting by hierarchy path.
+18. Added -include_common_path option for “identify_io_path_pins”.
+19. Enhanced “fix_hold_violations -dff_only”, support VT swapping.
+20. Enhanced “fix_hold_violations -fix_timing_window”, allow breaking hold a little.
+21. Fixed a crash when clock eco analysis due to long pin name.
+22. Fixed a bug that error reported when parsing timing report with propagated network delay removal.
+23. Fixed a bug that error reported for extra_supplies and isolation_supply_set UPF commands.
+24. Fixed a bug that eco cell overlapped with endcap cell when manual eco.
+25. Fixed a bug that multi-bit DFF could not be sized when manual eco.
+26. Fixed a bug that legal fail reason not reported when manual eco .
+27. Fixed a bug that fail to legal reported when buffer insertion, due to unmatched power domain.
+28. Fixed a bug that no cell or net arc error reported, when parsing latch time borrowing path.
+29. Fixed a bug that broke setup timing when fix setup, due to pocv transition sigma number.
+30. Fixed a bug that broke setup timing when fix setup using -dff_only.
+31. Fixed a bug that hold timing fix was slow due to long buffer list.
+32. Fixed a bug that attributes “launch/capture/data_points” not supported for timing_path.
+33. Fixed a bug that max_density and max_congestion not worked well in set_placement_constraint.
+34. Fixed a bug that -location {0 0} outputted by “write_design_changes” when place_not_ready.
+35. Fixed a bug that in post-mask ECO, all output pins of sized cells were tie 0.
+36. Fixed a bug that -max_displacement constraint was too restrictive for post-mask ECO.
+
+_xtop_handbook_0361_0001
+Fail Reasons
+
+Name
+cross_hierarchy_net --Current net cross physical hierarchies.
+
+Description
+Current net cross physical hierarchies. Before version 2021.03, it is not able to split such nets in optimization process. In version 2021.03, manual split net is enhanced to support cross hierarchy net, and in version 2021.09, split net is enhanced to support cross hierarchy in automatic optimization.
+
+480
+
+_xtop_ug_0056_0001
+# Chapter 4. Optimize Design
+## Automatic ECO
+### ECO Methods
+#### Size Cell
+Size Cell 
+This method is to change the reference cell of the specified instances. Modern process 
+provides variety of cells, including different sizes, vts, channel lengths and so on. It 
+does not just "size" a cell in the optimization flow. But for conventional reasons, it is 
+still called "size cell" here.  
+XTop sizes a cell according to three principles. And it is controlled by parameter 
+eco_cell_classify_rule.  
+	• Library attribute, the footprint, user function class, or just the function of all 
+pins. Use parameter eco_cell_match_attribute to choose the correct attribute.  
+	• Nominal swap keywords in names. For different vt or channel length, 
+commonly there are corresponding keywords in cell names. With this rule, cell 
+can be sized between these keywords. Use parameter 
+eco_cell_nominal_swap_keywords to set correct keywords.  
+	• Nominal sizing pattern in names. There is commonly a number represents the 
+area or driven strength in cell names. With this rule, cell can be really sized 
+with different size. Use parameter eco_cell_nominal_sizing_pattern to specify 
+the sizing pattern.  
+Normally, there is no extra limitation on sizing cell out of the principles. One 
+exception is fixing hold, it is prohibited to size up to avoid unexpected area cost even 
+though there perhaps exists reasonable sizing up solutions, for example, sizing a delay 
+buffer up.
+
+_xtop_handbook_0342_0001
+Parameters
+
+Name
+eco_si_critical_net_rank_ratio --What proportion of nets to be marked as si_critical net when fix hold or power.
+
+Type
+type: float "[0,1]"
+
+Default
+default = "0.05"
+
+Description
+This parameter defines the proportion of si_critical nets. XTop will sort nets by worst max_delta_delay, select top worst nets and mark si_critical flag. When fix hold or optimize leakage/dynamic power, XTop will not size the driver of net. Use it when si is already bad before fixing hold or leakage.
+
+Only works when fix hold or optimize power using size_cell method.
+
+Only sort the net which has valid max_delta_delay.
+
+Do not mark net without valid max_delay_data, even the ratio is 1.
+
+Use the worst max_delta_delay from all valid setup scenarios.
+
+Sort all nets of the design.
+
+When ratio is 0, no nets will be marked.
+
+When ratio is 1, all nets with valid max_delta_delay will be marked.
+
+Default ratio is 0.05, please change it based on your design.
+
+Examples
+The following example shows how to change the ratio.
+
+% set_parameter eco_si_critical_net_rank_ratio 0.1
+
+_xtop_handbook_0239_0001
+Arguments
+-buffer_list buffer_names Buffers used to fix violations, use eco_buffer_list_for_setup if not specified.
+
+-capacitance_margin margin_val Capacitance slack margin to be reserved with unit pF, use eco_capacitance_slack_margin if not specified.
+
+-debug_pins pin_list XTop will print more debug log for specified pins, and abort fix once all these pins have been scanned.
+
+-dff_only Only size dff (reg) cells when set. If not specified, only size comb cells. Suggest only swapping cells using nominal_keywords. It works with size cell alone.
+
+-effort effort_level Effort level in optimization, default is low.
+
+-enable_multithread Enable multi-thread sizing comb cells. This function is disabled when use debug_pins or only_pins.
+
+-group If group target pins according to interconnection and take pins in proportion for each iteration.
+
+-hold_margin margin_val Hold slack margin to be reserved with unit ns, use eco_hold_slack_margin if not specified.
+
+-methods method_list Methods used to fix setup, can be any combination of insert_buffer, size_cell, and split_net, default use insert_buffer and size_cell.
+
+-priority_weight type_name Priority weight to classify pins, for debugging purpose.
+
+-rel_transition_margin Relative transition slack margin to be reserved with rel_margin_val the value of percentage to max transition, use
+
+eco_relative_transition_slack_margin if not specified, a sum of transition_margin and rel_transition_margin will be actually used.
+
+-remove_buffer_only Remove buffer only to fix setup.
+
+-setup_target slack_val Target of setup slack with unit ns, use eco_setup_slack_target if not specified.
+
+-size_rule rule_type Indicate the rule used to find candidates for sizing cells, use eco_cell_classify_rule if not specified.
+
+-summarize_internal_iteration Summarize each internal iteration.
+
+-transition_margin margin_val Transition slack margin to be reserved with unit ns, use eco_transition_slack_margin if not specified.
+
+Description
+This command fixes setup GBA violations. For any pins, if there are paths through it, it will use the worst slack of paths instead of GBA slack. Generally, it is recommended to only fix violations on paths since GBA values are always pessimistic and will be over-fixed. But paths cannot cover all the violations, and it needs iterations to fix all the violations. If the concern is the completion rate, and the cost of over-fix is not that important, you can try this command.
+
+For detail, please refer to fix_setup_path_violations.
+
+_xtop_handbook_0258_0001
+Arguments
+-capacitance_margin margin_val Capacitance slack margin to be reserved with unit pF, use eco_capacitance_slack_margin if not specified.
+
+-debug_pins pin_list XTop will print more debug log for specified pins, and abort fix once all these pins have been scanned.
+
+-dff_only Only swap dff cells when set. If not specified, tool only swap comb cells at data path.
+
+-enable_multithread Enable multi-thread swap cells for comb cells. This function is disabled when use debug_pins or pin list.
+
+-group If group target pins according to interconnection and take pins in proportion for each iteration.
+
+-hold_margin margin_val Hold slack margin to be reserved with unit ns, use eco_hold_slack_margin if not specified.
+
+-rel_transition_margin Relative transition slack margin to be reserved with rel_margin_val the value of percentage to max transition, use
+
+eco_relative_transition_slack_margin if not specified, a sum of transition_margin and rel_transition_margin will be actually used.
+
+-setup_margin margin_val Setup slack margin to be reserved with unit ns, use eco_setup_slack_margin if not specified.
+
+-swap_vt_only When multi-thread is enabled, this can be specified to if user only swap VT, and legal margin is {0 0}, to speedup legalization.
+
+-transition_margin margin_val Transition slack margin to be reserved with unit ns, use eco_transition_slack_margin if not specified.
+
+Description
+This command optimizes the leakage power of the design by swapping cells with the specified keywords. The keywords must be specified in order such that corresponding cells are with descending leakage power.
+
+For those libraries with multiple dimensions of keywords, it is recommended to optimize several times with only one dimension in each iteration. However, if you does know how to sort keywords with multiple dimension, you can also specify a multiple dimension keyword list with "@" as the separator.
+
+This command returns the number of solutions committed. If you want to allow breaking setup after optimization, you can set the setup margin to a negative value.
+
+_xtop_release_0011_0001
+XTop Release Notes
+Release Note: 2019.06
+* New Features
+1. Added pro mode to reduce the memory consumption for large designs.
+2. Supported N5 rules in placement legalization.
+3. Supported post-mask ECO (both spare cell and GA cell) flow.
+4. Added timing window fix for hold timing optimization.
+* Enhancements
+1. Improved the speed of reading aocv tables.
+2. Added “-debug_pins” option for auto optimization commands.
+3. Replaced “-force_include/exclude” option with "-force" option for write_design_changes command.
+4. Enhanced “-path_type” option for get_paths commands.
+5. Enhanced scripts to read timing reports and get ilm objects for hyperscale mode.
+6. Fixed a crash while importing designs in parallel.
+7. Fixed a crash while buffer insertion in manual eco, due to assign nets.
+8. Fixed VT rule violations for S14nm process.
+9. Enhanced to support -side both abutment rule for S11nm process.
+
+_xtop_intro_0006_0001
+XTop Introduction
+
+Q：XTop支持什么工艺、多大容量的Design规模？
+A：
+容量方面：
+-能够处理100M+单元规模的数字设计
+-能够同时处理100+应用场景
+-针对Setup/Hold修复提供Turbo/Pro模式提升优化速度，减少内存占用
+
+支持先进工艺方面：
+-支持成熟工艺（90/65/40/28nm），也支持先进工艺（16/10/7/5nm）
+-支持基于LVF时序模型的POCV signoff时序优化
+-能够处理先进工艺下复杂物理规则约束：
+ 复杂pin track对齐、pin access估算, VT单元邻接摆放、多种行高混合摆放等
+
+_xtop_faq_v3_0072_0001
+# 5 Reports & Debugging
+Q14：优化setup 时，前一轮的post 结果与下一轮的pre 结果
+不一致，有哪些原因？ 
+A： 
+首先不论setup 还是hold，工具再在每轮eco 后自动打印出的pre 及post
+结果，前一轮的post 结果与下一轮的pre 结果，是百分百一致的，如下图： 
+前一轮post 结果：
+
+![前一轮post结果的示意图](resources/images/_xtop_faq_v3/img_page0046_fig0001.png) 
+
+下一轮pre 结果：
+
+![下一轮pre结果的示意图](resources/images/_xtop_faq_v3/img_page0047_fig0001.png) 
+
+出现前一轮的post 结果与下一轮的pre结果不一致的情况，大概率是用户在log 中使用了summarize命令，加入了一些option导致的，如"-io_only/-r2r_only/-exclude_path/-exclude_dont_touch"，以上几个option会对summarize命令的统计结果产生影响。
+
+_xtop_application_0007_0001
+XTop Applications
+
+Q：用XTop 修setup timing，脚本应该怎么写？
+A：
+···
+set_parameter eco_buffer_list_for_setup {BUF2 BUF4 BUF6}  ;# set buffers used to fix setup
+
+set_parameter eco_cell_classify_rule {cell_attribute}  ;# set the cell classify rule for gate sizing: cell_attribute, nominal_keywords, and nominal_regex
+set_parameter eco_cell_match_attribute {footprint} ;# set the size cell attribute matching type: footprint, user_function_class, pin_function
+set_parameter eco_cell_nominal_swap_keywords {lvt@l30 lvt@l40 svt@l30 svt@l40 hvt@l30 hvt@l40}  ;# set the nominal keywords for swapping cells.
+set_parameter eco_cell_nominal_sizing_pattern {D([0-9]+)BWP}  ;# set the nominal pattern for sizing cells.
+
+set report_dir "report"
+redirect -file $report_dir/mem.log {puts "Before opt the memory is [mem] KB."}
+redirect -file $report_dir/pre_opt.rpt {summarize_gba_violations -exclude_path -as_reference -setup}
+
+fix_setup_gba_violations -methods "size_cell" -effort high -setup_target 0.005 -hold_margin 0.0
+fix_setup_gba_violations -methods "size_cell" -size_rule nominal_keywords -setup_target 0.005 -hold_margin 0.0
+fix_setup_gba_violations -methods "insert_buffer" -setup_target 0.005 -hold_margin 0.0
+
+redirect -file $report_dir/mem.log -append {puts "After opt the memory is [mem] KB."}
+redirect -file $report_dir/post_opt.rpt {summarize_eco_actions}
+redirect -file $report_dir/post_opt.rpt -append {summarize_gba_violations -exclude_path -with_reference -with_delta -setup}
+
+set eco_output_dir "eco_output"
+write_design_changes -format ICC -eco_file_prefix xtop_opt_icc -output_dir $eco_output_dir
+write_design_changes -format ICC2 -eco_file_prefix xtop_opt_icc2 -output_dir $eco_output_dir
+write_design_changes -format INNOVUS -eco_file_prefix xtop_opt_innovus -output_dir $eco_output_dir
+write_design_changes -format PT -eco_file_prefix xtop_opt_pt -output_dir $eco_output_dir
+···
+
+_xtop_handbook_0238_0001
+Arguments
+-buffer_list buffer_names Buffers used to fix violations, use eco_buffer_list_for_hold if not specified.
+
+-debug_pins pin_list XTop will print more debug log for specified pins, and abort fix once all these pins have been scanned.
+
+-delay_cell_list delay_cell_names Delay cell list to specify delay buffer.
+
+-dff_only Only size dff cells (D flip-flop cells) when set. If not specified, only size comb cells. Suggest only swapping cells using nominal_keywords.
+
+-only_pins pin_list Only generate solutions on the specified pins if specified.
+
+paths Paths to fix hold violations, all if not specified.
+
+Description
+This command fixes hold violations of the specified paths, if the paths are not specified, it will fix all the violated hold paths. Those paths (including its endpoint) with slack (hold violation) less than the unreasonable slack value unreasonable_negative_slack , or the corresponding scenario and timing type is set as skipped will be ignored. Once the fix process finished, it will report the gain obtained, area and density variations.
+
+If the violations are not completely fixed, the statistics of fail reasons will also be reported. Thus, you can change the policy or release more resources according to these reasons. The command report_fail_reasons can help to review the detail reasons on specified objects.
+
+This command returns the number of solutions committed.
+
+_xtop_ug_0044_0001
+# Chapter 4. Optimize Design
+## Automatic ECO
+### Fix Setup and Hold Violations
+Fix Setup and Hold Violations 
+As a normal flow, XTop will read in the global setup and hold slack information 
+dumped from STA tool. Timing report is also supported but not obligated. XTop 
+provides both commands to fix GBA and PBA violations. However it should be 
+chosen carefully according to the design scale, the violation count, and the severity of 
+violations.  
+	• GBA disadvantages 
+		o Pessimistic violations which will cause over fix and extra cost of 
+resources. 
+		o Low flexibility to choose violations to fix. 
+	• PBA disadvantages 
+		o Low coverage while there exists plenty of violations. 
+		o Extra memory and time to dump, read and update timing paths. 
+According to the disadvantages of GBA and PBA, when there are only a small 
+amount of violations or the design area are really limited, PBA is recommended. 
+Otherwise, GBA is a better choice since it converges faster.  
+For hold violations, the most effective method is to insert buffer chain to increase the 
+delay. In order to keep consistency, XTop only allows to insert buffers at the sinks of 
+nets. For small hold violations, insert dummy optimization method can be used. 
+Another way is to size cells to weaker drive strength, including size down cells, or 
+size cell to different vt or channel length. Size up is prohibited here to avoid 
+ineffective solutions though it is reasonable for delay buffers. For very small 
+violations, XTop offers insert dummy cell method to increase wire load by adding a 
+dummy cell on net.  
+In hold fix, we provide a flag -max_cluster_loader_count to try to reduce buffer 
+count, and also improve fix result. This feature is suggested to turn on if user find 
+buffer count is not optimized as expect. Sometimes, there are many 'break_setup' 
+reasons in summary after a normal fix. For this case, flag -fix_timing_window can be 
+turned on to try to get a better setup margin and fix result.  
+For setup violations, the recommended methods are size cell, insert buffer and split 
+net. While these methods are specified together, XTop will choose the best one of 
+them by evaluating the benefit and cost. Another special method is to remove 
+redundant buffers or inverter pairs.  
+The normal flow does not allow to bring any new violations or worsen the existing 
+violations. If such situation encountered, corresponding fail reason will be marked on 
+pins, and current solution will be abandoned.
+
+_xtop_handbook_0279_0001
+Parameters
+
+Name
+max_thread_number --Specify the maximum thread number can be used.
+
+Type
+type: int "[1,100]"
+
+Default
+default = "8"
+
+Description
+This parameter specifies the number of threads can be used for current program. While this parameter is
+greater than 1, the program will try to run in parallel for those tasks like importing designs, loading timing
+libraries, timing data, timing report and so on.
+
+Examples
+The following example sets the max_thread_number as 8.
+
+% set max_thread_number 8
+      
+
+395
+
+_xtop_faq_v3_0013_0001
+# 1 Import Design
+Q13：如果12nm design 里面，加入了些9T 的std cell，site 还
+是用的12T，9T std cell 是手动按照位置fix 住的，这种情况怎
+么能让XTop 做优化？ 
+A： 
+首先XTop 当前是可以自动识别multi site design 的，
+用户只需将tlef 和lef 给
+全，def 中定义好不同row 所调用的site，工具就可以自动识别，且在下一步的
+eco legal 阶段也能正确识别和处理不同高度的cell 摆放在对应的row 上. 
+如遇上述情况，
+建议首先使用命令，
+check_placement_readiness 进行检查，
+提
+前定位site 不全问题，其次如果基于问题中的情况继续ECO，工具只能对12T 
+cell 进行legal，且因9T cell 不确定是否在12T 的row 中，故工具在legal 时，可
+能会出现看不到9T cell，而导致overlap 的情况
+
+_xtop_faq_v3_0079_0001
+# 6 General Usage
+Q6: exec 报错“couldn't fork child process: not enough memory”
+怎么办？ 
+A：在XTop 内部运行set Time [exec date +%Y%m%d]，会报错“couldn't fork 
+child process ： not enough memory” 
+xtop > set Time [exec date +%Y%m%d] 
+ 
+XTop 里利用exec fork 进程偶尔会报内存不足的情况，有可能跟swap 不足有
+关。 可以用以下命令替代： 
+xtop > set curtime [clock seconds] 
+xtop > set Time [clock format $curtime -format {%Y_%m_%d_%H_%M_%S}] 
+#%Y,%m,%d,%H,%M,%S 分别表示年月日时分秒。
+
+_xtop_ug_0049_0001
+# Chapter 4. Optimize Design
+## Automatic ECO
+### Optimize Cost
+Optimize Cost 
+XTop can utilize the timing redundant slacks to reduce the cost of design, including 
+leakage power and cell area. The process to swap cells between different vt and 
+channel lengths is called leakage optimization, and the process to size down cell or 
+remove buffers is called area optimization. During the optimization, setup, hold and 
+all design rules are considered, and it avoids to bring new violations after 
+optimization.  
+The default flow only commits eco operations on data path. DFFs can also be 
+swapped with an extra option -dff_only. However, it will be more timing consuming 
+than data path if there exists complex mutual constraints between DFFs.  
+Following are the corresponding commands to optimize leakage power and design 
+area. For detail, please query the handbook or with command man in XTop. 
+ 
+xtop> optimize_leakage_power 
+SYNOPSIS 
+  int optimize_leakage_power 
+    [-keywords name_list] 
+    [-hold_margin margin_val] 
+    [-setup_margin margin_val] 
+    [-transition_margin margin_val] 
+    [-rel_transition_margin rel_margin_val] 
+    [-capacitance_margin margin_val] 
+    [-effort effort_level] 
+    [-group] 
+    [-summarize_internal_iteration] 
+    [-dff_only 
+     | -enable_multithread] 
+    [-auto_iteration iteration_number] 
+    [-only_pins pin_list 
+     | cells] 
+    [-debug_pins pin_list] 
+ 
+xtop> optimize_design_area 
+SYNOPSIS 
+  int optimize_design_area 
+    [-remove_buffer_only 
+     | -pattern str] 
+    [ dff_only] 
+    [-hold_margin margin_val] 
+    [-setup_margin margin_val] 
+    [-transition_margin margin_val] 
+    [-rel_transition_margin rel_margin_val] 
+    [-capacitance_margin margin_val] 
+    [-effort effort_level] 
+    [-summarize_internal_iteration] 
+    [-only_pins pin_list 
+     | cells] 
+[-debug_pins pin_list]
+
+_xtop_handbook_0325_0001
+Parameters
+
+Name
+eco_ga_cell_sizing_rule --Allow more sizing candidates for GA cell in postmask eco.
+
+Type
+type: enum "partial complete"
+
+Default
+default = "partial"
+
+Description
+By default, sizing from GA cell to non-GA cell, or non-GA cell to GA cell is not allowed in postmask eco.
+Tool provide this parameter to allow the behavior. It should be used very carefully.
+
+Examples
+The following example shows how to set the parameter:
+
+% set_parameter eco_ga_cell_sizing_rule complete
+      
+
+443
+
+_xtop_handbook_0250_0001
+Commands
+
+Name
+mark_hold_gba_pin_rank --Set pin's rank type for hold gba fix.
+
+Synopsis
+mark_hold_gba_pin_rank -type rank_type [pins]
+
+enum type in "count countSlack slack si siReverse margin congestion congestionReverse"
+
+collection pins
+
+Arguments
+-type rank_type Define rank type to calculate rank value for hold gba fix.
+
+pins Pins that will be marked, all if not specified.
+
+Description
+This command will define the criteria for calculating rank value of each pin, which is used to handle pin's
+hold fix priority. So that when -effort option is not low, we can put all pins to different groups, for a better
+optimization result. Basically, the default rank type is good enough for most cases, user can change the
+rank type according to their need. Only input pins with violation will be marked in this command.
+
+The option -type defines different rank type for calculating pin's rank. We now offer following type for
+the command:
+
+--count: it is the sum of violated endpoint's weight, that in the downstream of current pin, where the weight
+of each endpoint is set to 1.0, higher priority if the pin is more significant to fix those violations.
+
+--countSlack: same as count, but setting violated weight to endpoint's slack instead of 1.0.
+
+--si: pin's SI value.
+
+--siReverse: reversed order of si.
+
+--margin: pin's setup margin, higher priority for better margin.
+
+--slack: pin's hold slack, start from the worst one.
+
+--congestion: pin's congestion ratio.
+
+--congestionReverse: reversed order of congestion.
+
+When option pins specified, all fanin and fanout will be traced. If need to fix only these pins, they should
+also be added to fix command.
+
+When the command is not explicitly called by user, default rank type is count. Otherwise, the marked rank
+type is used. In both cases, the command will always be called automatically in fix hold gba process, if
+effort is not low.
+
+Old pin rank will be cleared when the command is called.
+
+We guarantee that pin with larger rank value always has higher priority. So for some rank type, rank value
+will be adjusted to the opposite number of its original one.
+
+Examples
+The following example set rank type to congestion for hold gba fix.
+
+% mark_hold_gba_pin_rank -type congestion
+      
+
+See Also
+mark_hold_path_pin_rank
+
+353
+
+_xtop_faq_v3_0084_0001
+# 6 General Usage
+Q11：Turbo/Pro mode 对速度的提升大致有多少？ 
+A： 
+首先应明确Turbo/Pro mode 的区别，turbo mode 是在sta 中dump timing 
+data 阶段，
+通过减少不必要的数据提取，
+进而缩短runtime，
+而pro mode 是
+在turbo mode 的数据基础上，
+对工具内部数据结构及内存管理机制的优化，
+在turbo mode 减少runtime 的基础上，进一步降低mem cost，也就是说，
+在runtime 上，turbo 和pro mode 基本无差别，具体的turbo 和pro mode 的速度提升数值，可以参考introduction slide 中的第4 页intro_slide。
+
+_xtop_handbook_0240_0001
+Arguments
+-buffer_list buffer_names Buffers used to fix violations, use eco_buffer_list_for_setup if not specified.
+
+-debug_pins pin_list XTop will print more debug log for specified pins, and abort fix once all these pins have been scanned.
+
+-dff_only Only size dff (reg) cells when set. If not specified, only size comb cells. Suggest only swapping cells using nominal_keywords. It works with size cell alone.
+
+-enable_multithread Enable multi-thread sizing comb cells. This function is disabled when use debug_pins or only_pins.
+
+-only_pins pin_list Only generate solutions on specified pins if specified.
+
+-priority_weight type_name Priority weight to classify pins, for debugging purpose.
+
+paths Paths to fix setup violations, all if not specified.
+
+Description
+This command fixes setup violations of the specified paths, if the paths are not specified, it will fix all the violated setup paths. Those paths with slack less than the unreasonable slack value unreasonable_negative_slack, or the corresponding scenario and timing type is set as skipped will be ignored.
+
+Once the fix process finished, it will report the gain obtained, area and density variations. If the violations are not completely fixed, the statistics of fail reasons will also be reported. Thus, you can change the policy or release more resources according to these reasons. The command report_fail_reasons can help to review the detail reasons on specified objects.
+
+This command returns the number of solutions committed.
+
+_xtop_faq_v3_0026_0001
+# 2 MMMC和Timing Data
+Q3：.lib 和.idb 文件有什么区别？ 
+A：当时序库文件采用ccs format 的时候，通常会文件很大，导入很费时间。 
+这种情况下，
+建议先把时序库.lib文件转换成 .idb 格式 （XTop 的私有文件格式）
+，
+然后再按照.lib 的方式导入文件。 
+例如： 
+% $XTOP_HOME/bin/lib2idb  -libs “…/lib/*.lib”  -output_dir “.../lib/”   -thread 8
+
+需要注意的是，这个加速方式只针对时序库文件的导入，无法通过这种方式对STA data导入进行加速。
+
+_xtop_handbook_0207_0001
+Commands
+
+Name
+size_cell --Size specified cell instances to the specified cell.
+
+Synopsis
+size_cell [-design design_name] [-location coord...] cell_list lib_cell
+
+string design
+
+pointf location
+
+collection cell_list
+
+collection lib_cell
+
+Arguments
+-design design_name Design for this action.
+
+-location... coord Location for the cell.
+
+cell_list Cells to size.
+
+lib_cell Library cell to size to.
+
+Description
+This command sizes the specified instances to the specified cell. It will first check if the specified instances
+can be changed, and the specified master is legal.
+
+If the placement legalization is on, it will try to find a correct place for the changed cell in the
+legalization margin. If failed, by default, these cells will be put just at the specified positions, and it will
+go on updating timing. If the placement legalization is an obligation, you can just turn the parameter
+placement_legalization_obligated on. Thus if any cell failed to legalize, it will report an error and revert
+back.
+
+For following situations, it will report errors.
+
+--Any of the library cells of the specified instances is not available.
+
+--Any of the timing library cells of specified instances is not complete for all corners.
+
+--The library for the specified cell is not available.
+
+--The timing library for the specified cell is not complete for all corners.
+
+--Any of the specified instances is not unique in Verilog.
+
+--Any of the specified instances is locked in placement.
+
+--Any of the specified instances is connected to a multi-driven net.
+
+--Function of the specified lib cell mismatches with original.
+
+The following example size regs/dram1/U181/add_buf_4 to BUFFD12BTH, with user specified location.
+
+% size_cell -design {cpu} -location {(20.772, 179.597)} \
+            {regs/dram1/U181/add_buf_4} {BUFFD12BTH}
+
+_xtop_handbook_0237_0001
+Arguments
+-buffer_list buffer_names Buffers used to fix violations, use eco_buffer_list_for_hold if not
+
+specified.
+
+-capacitance_margin margin_val Capacitance slack margin to be reserved with unit pF, use eco_capacitance_slack_margin if not specified.
+
+-debug_pins pin_list XTop will print more debug log for specified pins, and abort fix once all these pins have been scanned.
+
+-delay_cell_list delay_cell_names Delay buffer list to specify delay buffer.
+
+-dff_only Only size dff (reg) cells when set. If not specified, only size comb cells. Suggest only swapping cells using nominal_keywords.
+
+-effort effort_level Effort level in optimization, default is low.
+
+-group If group target pins according to interconnection and take pins in proportion for each iteration.
+
+-hold_target slack_val Target of hold slack with unit ns, use eco_hold_slack_target if not specified.
+
+wants to use this feature.
+
+-rel_transition_margin Relative transition slack margin to be reserved with rel_margin_val the value of percentage to max transition, use
+
+eco_relative_transition_slack_margin if not specified, a sum of transition_margin and rel_transition_margin will be actually used.
+
+-setup_margin margin_val Setup slack margin to be reserved with unit ns, use eco_setup_slack_margin if not specified.
+
+-size_cell_only Size cell only to fix hold, and only size down.
+
+-size_rule rule_type Indicate the rule used to find candidates for sizing cells, use eco_cell_classify_rule if not specified.
+
+-summarize_internal_iteration Summarize each internal iteration.
+
+-transition_margin margin_val Transition slack margin to be reserved with unit ns, use eco_transition_slack_margin if not specified.
+
+Description
+This command fixes hold GBA violations. For any pins, if there are paths through it, it will use the worst slack of paths instead of GBA slack. Generally, it is recommended to only fix violations on paths since GBA values are always pessimistic and will be over-fixed. But paths cannot cover all the violations, and it needs iterations to fix all the violations. If the concern is the completion rate, and the cost of over-fix is not that important, you can try this command.
+
+For detail, please refer to fix_hold_path_violations. If you want to allow breaking setup after optimization, you can set the setup margin to a negative value.
+
+_xtop_release_0004_0001
+XTop Release Notes
+Release Note: 2021.12
+* New Features
+1. Supported temperature scaling in timing optimization.
+* Enhancements
+1. Enhanced delay calculation, consider R/C tree to estimate wire delay when size_cell.
+2. Enhanced setup fix, improve the accuracy of pre-analysis to speed up the evaluation.
+3. Enhanced setup fix, add parameter control for area change ratio during sizing.
+4. Enhanced setup fix, support auto off-path factor adjustment for better accuracy.
+5. Enhanced delay calculation, consider the impact of ocv sigma transition.
+6. Enhanced timing fix, enable when LEF files are not complete.
+7. Enhanced leakage analysis and optimization, provide option to control iterations.
+8. Enhanced clock eco, support using inverter pair to fix.
+9. Enhanced post-mask eco, for the spare cell identification.
+10. Enhanced eco script generation, improve the PR tool implementation speed.
+11. Enhanced the fail reason of "fail_to_legalize", including more details.
+12. Added a new attribute length for net objects.
+13. Added a new attribute is_spare_cell for cell objects.
+14. Added new commands to set and report setup extra derate value for scenarios.
+15. Added a new command to return an empty collection.
+16. Added a new command to check cell placement overlap.
+17. Added a new parameter to auto set setup_extra_derate according to process.
+18. Fixed a bug that tool crash when fix_glitch_violations, due to split_net.
+19. Fixed a bug that tool crash when solution commit in clock eco.
+20. Fixed a bug that tool crash when remove_buffer connecting to P/G port.
+21. Fixed a bug that tool cannot read timing report with "cycle clock jitter".
+22. Fixed a bug that timing not updated correctly after move_cell manual eco.
+23. Fixed a bug that IP bus timing arc not recognized due to bus and bit timing group definition.
+24. Fixed a bug that pin attribute "fanin/fanout_points" not return a collection.
+25. Fixed bugs that attribute and filter condition not working correctly.
+26. Fixed a bug that power domain conflict error reported when buffer insertion to fix hold.
+27. Fixed a bug that inconvenient error information for scenarios failed when read timing data.
+28. Fixed a bug that some buffer left some aborted when split net, causing transition to get worse.
+29. Fixed a bug that inverter pairs can not be deleted by remove buffer of auto optimization.
+
+_xtop_handbook_0225_0001
+Arguments
+-add_on_route Output add_buffer_on_route command for split net action in ICC2
+
+format.
+
+-eco_file_prefix file_name_prefix Prefix for eco files to write out netlist and physical changes.
+
+-exclude_new_created Exclude new created instances when output physical changes.
+
+-format file_format Output file format: NATIVE, INNOVUS, CUI, SOC, ICC, ICC2, PT, ATOP or V_DEF(experimental), default is INNOVUS.
+
+-last_n output_command_count Write out the last N eco commands.
+
+-output_dir file_output_directory Directory for eco files to write out.
+
+-version val Output CUI commands for specified tool version.
+
+Description
+This command will write logical and physical changes for design into script files. For logical changes, option -last_n can be used to only output the changes of last N eco commands. For physical changes, it will always output all the changes. Currently formats for NATIVE, INNOVUS, CUI, SOC, ICC, ICC2, PT, ATOP and V_DEF(experimental) flows are supported. Especially for V_DEF(experimental), it writes out the design changes into an incremental def file(.def), and at the meantime, it writes out the whole current design into a verilog file(.v).
+
+_xtop_faq_v3_0086_0001
+# 6 General Usage
+Q13: 如果design 已经插满了filler 单元，xtop 做完eco 能自动回填吗？ 
+A: 
+针对以上情况，xtop 在不同mode 下的行为存在着区别，首先 
+在normal mode 下： 
+如果当前design中已经插满了filler，
+正常情况下，
+工具只能进行swap vt，
+即不改变原有cell 位置，只进行LVT/SVT/HVT 的互换，但在某些先进工艺下，
+因vt rule 的存在，不同vt cell 可能也存在着legal 时会挪动位置的现象，因
+此可能swap vt 也做不了 
+综上，为了提升工具的兼容性，减少用户再回到pr tool 中remove filler
+后再dump db 的迭代时间，
+xtop 提供了一个command：
+"set_removable_fillers",
+帮助用户直接在xtop 中将filler cell 移除，具体用法如下： 
+xtop > link_reference_library ... 
+xtop > set_removable_fillers {FILLX2 FILLX4 DCAPX8 DCAPX12} 
+xtop > import_design 
+ 
+Note: 该命令必须在link_reference_library 之后，import_design 之前进行设置，否则无效 
+设置了该命令后，工具会自动移除当前design 中的filler cell，此时即可正常插入cell，且在写出的脚本中，插入功能cell 位置的filler cell 也会添加对应命令进行移除，但工具仅会对filler 进行移除，不会进行回填，大致效果如下图： 
+
+![使用set_removable_fillers指令后工具不会进行filler回填的示意图](resources/images/_xtop_faq_v3/img_page0055_fig0001.png) 
+
+如上图所示，对一个buffer 进行size up 后，实际D16 buffer 右侧还空余了一部分空间，但此时xtop 不会进行filler 回填，将该区域填满，用户可返回到pr tool 中，进行此区域的回填。 
+在postmask eco mode 下： 
+工具可以自动的进行filler cell 的回填。
+
+_xtop_faq_v3_0031_0001
+# 2 MMMC和Timing Data
+Q8：如果部分scenario 的数据是normal 的，部分scenario 的
+数据是turbo 的，怎么处理？ 
+A： 
+首先不建议用户这样进行timing data 的混用，XTop 的官方flow 中没有指出可
+以对两种mode 数据混杂在一起进行eco，且工具在read_timing_data 阶段，检
+查到这种数据时，会报出如下warning： 
+
+![timing data混用warning示意图](resources/images/_xtop_faq_v3/img_page0025_fig0001.png) 
+
+因turbo mode 在写出数据时仅会将vio point 及其前后3 级相关pin 的
+attribute/clock info 写出，故会存在某些pin 的max_tran/max_cap 在turbo 
+mode 对应的scenario 中没有数值，如下图： 
+
+![某些pin attribute在turbo mode scenario中没有数值的示意图](resources/images/_xtop_faq_v3/img_page0025_fig0002.png) 
+
+且因某一scenario 下的pin 属性不全，
+工具在auto ECO 阶段，
+将看不到该scenario
+下的margin，因此会导致做完ECO 后，回到STA 工具种出现该scenario 过修的
+情况。 
+综上，如果用户使用了这种混用的timing data，还是建议用户对scenario 数据
+mode 进行统一，如果用户不希望重新dump，继续执行ECO 的话，也需要提前
+和用户明确此种情况会带来的影响。
+
+_xtop_release_0013_0001
+XTop Release Notes
+Release Note: 2018.12
+* New Features
+1. Added turbo mode to speed up violation fix iteration for large designs.
+2. Support n7+ rules in placement legalization.
+3. Support to cluster load pins in the same hierarchy while inserting buffer to fix hold.
+4. Support to save and restore dont touch objects during optimization process. 
+* Enhancements
+1. Optimized buffer chain placement strategy for better routing result.
+2. Enhanced sizing down policy to reduce the error of transition estimation.
+3. Added parameter to filter those solutions with too small gains while fixing setup.
+4. Fixed a crash while sizing cells driven by black box.
+5. Improved the speed of getting violated pins.
+
+_xtop_faq_v3_0074_0001
+# 6 General Usage
+Q1:XTop 怎么启动多线程加速？ 
+A：请设置max_thread_number控制参数（建议设置为scenario的最大值）。 
+xtop > set max_thread_number 8 
+ 
+它指定了采用的多线程的thread 数目。 当大于1 的时候，工具会采用并行的方法去导入design文件、链接timing library、读入timing data/report 等。（但是在做时序优化的时候，仍然会是单cpu 的模式） 
+
+max_thread_number和scenario的最大值N的对数还会影响timing fix check license的数量：licenses = log2(N)  
+特殊地，leakage优化还会需要额外check一个license，所以：
+2个scenario的leakage优化需要1+1个license；
+8个scenario的leakage优化需要3+1个license。
+
+_xtop_handbook_0350_0001
+Parameters
+
+Name
+eco_voltage_setup_extra_derate --Set a few voltage and derate value pairs, which are used to calculate
+an extra setup derate by linear interpolation.
+
+Type
+type: pointf_list
+
+Default
+default = ""
+
+Description
+This parameter will allow user to add a few voltage and derate pairs, a derate value will be calculated by
+these pairs using linear interpolation, according to actual voltage value.
+
+When command set_setup_extra_derate is also used, extra derate calculated from this parameter will
+have higher priority if voltage is valid and in bound. Use report_setup_extra_derate to validate.
+
+At least two pairs of value should be specified.
+
+Examples
+The following example shows how to set the parameter:
+
+% set_parameter eco_voltage_setup_extra_derate {(0.55, 1.20) (0.65, 1.15) (0.75, 1.05)}
+      
+
+468
+
+_xtop_faq_v3_0070_0001
+# 5 Reports & Debugging
+Q12：优化时shell 上报的report 为什么跟自己用summarize
+命令报的不一样？ 
+A： 
+XTop 在auto eco 阶段开始前及结束后，
+会分别自动在shell 上打印本轮eco
+前后的时序情况，默认会包含所有当前scenario 的Count/Worst/TNS，会分为
+pre-optimization summary 及post-optimization summary，具体格式如下：
+pre-optimization summary： 
+
+![pre-optimization summary的格式示意图](resources/images/_xtop_faq_v3/img_page0045_fig0001.png) 
+
+post-optimization summary： 
+
+![post-optimization summary的格式示意图](resources/images/_xtop_faq_v3/img_page0045_fig0002.png) 
+
+而summarize_gba/path_violations 命令格式如下： 
+
+![summarize_gba/path_violations指令的输出结果格式示意图](resources/images/_xtop_faq_v3/img_page0045_fig0003.png) 
+
+从以上两张图片中看到，不管是Count，Worst 还是TNS 都是可以对上的，
+当用户反馈两种方式的report 不一致时，大致有以下几种原因： 
+① 首先应和客户明确当前summarize 命令与auto eco 命令所统计的timing 
+type 是否为同一类，避免出现auto eco 进行的是setup fix 而summarize 统计的是
+hold 结果 
+② 确认统计的额timing type 为同一种后，
+应和客户明确auto eco 所使用的
+eco mode，避免出现auto eco 进行的是gba fix 而summarize 统计的是path report 
+③ 以上两种情况均确认无问题后，请检查summarize 命令，是否在执行该
+命令时有添加一些option，如"-io_only/-r2r_only/-exclude_path/-exclude_dont_tou
+ch",因当前auto eco 会将所有vio 的点均统计进来，但这里面可能存在着一些io
+ pin/port 或dont_touch 等特殊vio 点，用户不希望再统计结果种看到，因此以上
+几个option 会对summarize 命令的统计结果产生影响，当用户出现该情况时，
+请
+对用户进行解释和说明。
+
+_xtop_handbook_0344_0001
+Parameters
+
+Name
+eco_size_cell_area_change_ratio --When size cell to fix setup, XTop offers this parameter to limit the
+area change in one optimization process.
+
+Type
+type: float "[1,inf)"
+
+Default
+default = "6.0"
+
+Description
+When size cell to fix setup, sometimes original cell will be sized too large. This parameter can limit the
+area change. If a smaller ratio is set, more area will be saved, but fix result will also be different.
+
+Only effective for fix setup, or fix timing window for hold, in one iteration run.
+
+Examples
+The following example shows how to change the ratio.
+
+% set_parameter eco_size_cell_area_change_ratio 3.0
+      
+
+462
+
+_xtop_handbook_0324_0001
+Parameters
+
+Name
+eco_ga_auto_refill --Allow auto refill GA fillers for post mask eco.
+
+Type
+type: bool
+
+Default
+default = "true"
+
+Description
+By default, GA fillers will be auto refilled after post mask eco. When this parameter is set false, the refilling
+will be skipped. User should add GA fillers by themselves after all the eco actions.
+
+This parameter is only effective for post mask eco flow.
+
+Examples
+The following example shows how to disable the parameter:
+
+% set_parameter eco_ga_auto_refill false
+      
+
+442
+
+_xtop_handbook_0329_0001
+Parameters
+
+Name
+eco_gain_threshold --The acceptable minimum gain when fix hold/setup/transition, the unit is ns.
+
+Type
+type: float "[0,inf)"
+
+Default
+default = "0.001"
+
+Description
+This parameter controls the minimum gain when fix setup/hold/transition. Note any fix by split_net method
+will ignore this parameter.
+
+Only solution which on-path gain >= eco_gain_threshold on refSce will be accepted.
+
+The refSce is the worst non-skipped scenario when fix timing. In general, user set this parameter only
+when fix setup using size_cell or insert_buffer method.
+
+Examples
+This example sets the eco_gain_threshold parameter is 0.005ns.
+
+% set_parameter eco_gain_threshold 0.005
+% fix_setup_path_violations
+      
+
+447
+

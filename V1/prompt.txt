@@ -1,0 +1,173 @@
+你是一名 EDA 工具文档结构化抽取专家。你的任务是：对我提供的 EDA 文档进行信息抽取与结构化建模，把文档中出现的所有与以下 Schema 相关的内容进行**完全实例化**（尽可能不遗漏），并输出为“**每个实例一个 JSON 对象**”。
+
+---
+
+## 0) 你必须牢记并使用的 Schema 模板（不可改名、不可增删字段）
+你只能产出以下类的实例，字段名必须完全一致；不得增加任何新字段。
+
+### Class Command
+- name: 指令名字
+- usage: 指令功能
+- syntax: 语法
+- arguments: 选项列表，每个成员指向一个 Argument 实例（用 Argument.name）
+- values: 参数列表（该 Command 自身位置参数/必填参数/非-开头参数等；每个成员是一个对象，含 usage/type/optional/values）
+  - usage: 参数含义
+  - type: 参数类型（string/int/float/bool/enum/range/file/path/list/unknown）
+  - optional: 是否可选（true/false/unknown）
+  - values:
+    - 离散取值：每项含 value, usage, senarios
+    - 连续取值：每项含 range, special values, senarios
+- examples: 使用例子列表，每个成员指向一个 Example 实例（用 Example.name）
+- senarios: 使用场景（更抽象的 EDA 任务）
+- ref_chunk_id: 该实例对应的chunk id
+
+### Class Argument
+- name: 选项名字
+- usage: 选项功能
+- syntax: 语法
+- values: 若有则按离散/连续规则展开（同 Command.values 的 values 子结构）
+- examples: 使用例子列表（引用 Example.name）
+- senarios: 使用场景
+- ref_chunk_id: 该实例对应的chunk id
+
+### Class Parameter
+- name: 变量名字
+- usage: 变量功能
+- type: 变量类型
+- values: 按离散/连续规则展开
+- senarios: 使用场景
+- ref_chunk_id: 该实例对应的chunk id
+
+### Class Example
+- name: 例子内容（尽量原文原句/原命令行）
+- usage: 例子实现的功能
+- senarios: 例子使用的场景
+- ref_chunk_id: 该实例对应的chunk id
+
+### Class Mode
+- name: 模式名字
+- usage: 模式的功能
+- senarios: 模式使用的场景
+- ref_chunk_id: 该实例对应的chunk id
+
+### Class File
+- name: 文件名字
+- usage: 文件功能
+- ref_chunk_id: 该实例对应的chunk id
+
+### Class Fail Reasons
+- name: 失败原因名字
+- reasons: 失败原因
+- description: 介绍
+- resolution: 用到了什么命令/参数/选项（用名称引用，列表）
+- ref_chunk_id: 该实例对应的chunk id
+
+### Class Issues
+- name: 遇到的问题（抽象问题）
+- descriptions: 问题描述与解释（可较长，允许原文摘录打包）
+- ref_chunk_id: 该实例对应的chunk id
+
+### Class Concept
+- name: EDA 重要概念
+- description: 概念描述
+- ref_chunk_id: 该实例对应的chunk id
+
+### Class Operation
+- name: 操作名称（包括 GUI/流程动作/设置 dont_touch 等）
+- description: 操作描述
+- ref: 涉及什么参数/命令/选项（用名称引用，列表）
+- effect: 操作产生的影响、后果
+- ref_chunk_id: 该实例对应的chunk id
+
+> 注意：usage 更贴合原文表述；senarios 更抽象的 EDA 任务。二者可相同。  
+> 注意：FAQ/长段解释难拆时，优先放进 Issues.descriptions，并从中提炼 Concept/Command/Operation 等。  
+
+---
+
+## 1) 输入
+文档原文如下（保持原样）：
+<<DOC>>
+
+---
+
+## 2) 抽取与实例化规则（强约束）
+1. **全量覆盖**：文档中出现的所有命令/选项/参数/模式/文件/示例/失败原因/问题/概念/操作，均应实例化。宁可多建，不要漏。
+2. **去重合并**：同名同义实体只保留一个实例；不同章节描述互补则合并补全字段。
+3. **保持原貌**：
+   - 命令/选项/参数/文件名保持原文大小写与符号（如 `set_*`、`-hold`、`.sdc`）。
+   - 不得编造不存在的命令/选项/取值/语法。
+4. **引用一致**：
+   - Command.arguments 必须引用已定义的 Argument.name
+   - Command.examples、Argument.examples 必须引用已定义的 Example.name
+   - Operation.ref、Fail Reasons.resolution 引用 Command/Argument/Parameter/Mode/File 的 name（列表）
+5. **类型与取值**：
+   - enum（离散）与 range（连续）要区分；不确定则 type=unknown，并尽量保留原文线索在 values 中。
+   - optional 只能是 true/false/unknown
+6. **缺失信息处理**：原文未给出的字段，填空字符串 "" 或 unknown（按字段语义），但不得省略字段。
+7. **Issues 优先**：难以结构化的长段 FAQ/解释性文本，先放 Issues.descriptions，再抽关键实体建模。
+8. **粒度策略**：
+   - 命令行指令 → Command
+   - 以 `-` 开头的开关/选项 → Argument
+   - 可设置的变量/配置项（非 `-` 开头，或以 variable/option/parameter 形式出现）→ Parameter
+   - mode/state/flow → Mode
+   - GUI/流程动作/设置动作 → Operation
+   - 报错/失败原因 → Fail Reasons（必要时也在 Issues 中并列）
+9. **场景抽象**：为每个实体补 senarios（EDA 任务层抽象）：timing closure、fix setup、fix hold、ECO、signoff、P&R、CTS、routing、power analysis、IR drop、EM、DRC/LVS、library management、constraint management、runtime/memory optimization、debug 等。
+10. **不得输出任何解释性散文**（除最后的覆盖检查表 JSON）。
+
+---
+
+## 3) 输出格式（必须严格遵守）
+你的输出必须是**纯 JSON Lines（JSONL）**：  
+- 每一行是一个完整的 JSON 对象  
+- 不要用 Markdown 包裹输出  
+- 不要输出数组（不要用 `[` `]`）  
+- 不要输出除 JSON 对象之外的任何文字  
+- 每个 JSON 对象必须包含一个字段：`"__class"`，其值只能是下列之一：
+  - "Command" | "Argument" | "Parameter" | "Example" | "Mode" | "File" | "Fail Reasons" | "Issues" | "Concept" | "Operation"
+- 除 `"__class"` 外，其余字段必须严格等于对应类的字段（不可多、不可少）
+- 同一个实例只能输出一次（去重后输出）
+
+### 3.1 JSON 字段要求
+- 所有字符串字段必须是 JSON string（即使为空也要给 ""）
+- 列表字段必须是 JSON array（即使为空也要给 []）
+- senarios 必须是 JSON array of strings（例如 ["timing closure","debug"]），不要用单个字符串
+- Command.values 必须是数组；每个元素对象必须包含：usage/type/optional/values 四个字段
+- Argument.values / Parameter.values 若无取值信息，输出空数组 []
+
+### 3.2 离散/连续取值的 JSON 形状
+- 离散取值（enum）：
+  - "values": [
+      { "value": "...", "usage": "...", "senarios": ["..."] }
+    ]
+- 连续取值（range）：
+  - "values": [
+      { "range": "...", "special values": ["..."], "senarios": ["..."] }
+    ]
+> 若无法判断离散/连续：允许 values 里只保留一条，使用你能从原文得到的最接近形状；type 写 unknown。
+
+---
+
+## 4) 最后一行：覆盖检查表（也必须是 JSON）
+输出完所有实例后，**最后一行**再输出一个 JSON 对象，格式如下（字段名必须一致）：
+{
+  "__class": "Coverage",
+  "counts": {
+    "Command": 0, "Argument": 0, "Parameter": 0, "Example": 0, "Mode": 0,
+    "File": 0, "Fail Reasons": 0, "Issues": 0, "Concept": 0, "Operation": 0
+  },
+  "risk_of_omissions": ["...","..."]
+}
+注意：Coverage 不是 schema 类之一，但必须输出；且只允许这一个“额外对象”。除 Coverage 外仍不得增字段。
+
+---
+
+## 5) 质量门槛（必须自检）
+- 不允许出现“引用了但未定义”的 Argument/Example。
+- 不允许编造命令/选项/取值。
+- 每个实例必须包含其类要求的全部字段（即使为空）。
+- 输出必须可被逐行 JSON 解析器直接解析。
+
+---
+
+现在开始：读取 <<DOC>>，按以上规则输出 JSONL。

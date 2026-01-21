@@ -1,0 +1,71 @@
+[
+  {
+    "chunk_id": "_xtop_abb_0001_0001",
+    "doc_id": "_xtop_abb_0001",
+    "source": "_xtop_abb",
+    "extracted": {
+      "Concept": [
+        {
+          "class": "Concept",
+          "name": "EDA",
+          "description": "Electronic Design Automation，电子设计自动化，指利用计算机软件工具来设计和验证电子系统（如集成电路）的整个过程。"
+        },
+        {
+          "class": "Concept",
+          "name": "ECO",
+          "description": "Engineering Change Order，工程变更指令，用于在芯片设计过程中对设计进行修改和优化，特别是在时序优化阶段。"
+        },
+        {
+          "class": "Concept",
+          "name": "OCV",
+          "description": "On Chip Variation的缩写，指芯片制造过程中由于工艺变化导致的芯片内部不同区域的电气特性差异。这种变异会影响芯片的时序性能，因此在静态时序分析（STA）中需要考虑OCV以确保设计的可靠性。"
+        },
+        {
+          "class": "Concept",
+          "name": "AOCV",
+          "description": "Advanced On Chip Variation，是OCV（On Chip Variation）的高级形式，用于更精确地建模芯片上的工艺变化。在时序分析中，AOCV考虑了更复杂的变异因素，以提高时序收敛的准确性。"
+        },
+        {
+          "class": "Concept",
+          "name": "SOCV",
+          "description": "Statistical On Chip Variation，统计性片上变异，用于描述芯片制造过程中因工艺波动导致的器件参数变化，影响芯片性能和时序分析的准确性。"
+        },
+        {
+          "class": "Concept",
+          "name": "POCV",
+          "description": "Parametric On Chip Variation, same as SOCV"
+        },
+        {
+          "class": "Concept",
+          "name": "LVF",
+          "description": "Liberty Variation Format，一种用于描述芯片设计中工艺变化的格式。"
+        },
+        {
+          "class": "Concept",
+          "name": "STA",
+          "description": "Static Timing Analysis，静态时序分析，用于验证数字电路设计是否满足时序要求的分析方法。在EDA领域，STA是常用的工具，例如Prime Time软件用于执行STA并导出时序数据文件。"
+        },
+        {
+          "class": "Concept",
+          "name": "PnR",
+          "description": "Placement and Route，指在芯片设计中对电路进行布局和布线的过程。"
+        },
+        {},
+        {},
+        {},
+        {},
+        {
+          "class": "Concept",
+          "name": "DFF",
+          "description": "D flip-flop, D触发器，一般在芯片设计中用作寄存器"
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ]
+    }
+  }
+]
