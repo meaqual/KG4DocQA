@@ -6560,6 +6560,10 @@
     },
     {
       "id": "kg_Operation_0172",
+      "class": "Operation",
+      "name": "不支持Hyperscale技术",
+      "description": "该条目明确说明XTop工具不支持Hyperscale（超大规模）时序分析技术。Hyperscale是一种旨在平衡分析精度与资源消耗的先进层次化时序分析方法，它将顶层扁平化分析分解为对各个模块（block）的独立分析，并精确处理顶层与模块间的时序接口，从而在保证全芯片分析精度的同时，大幅减少内存使用和运行时间。",
+      "related_commands": [],
       "effect": "HyperScale 技术可以减少运行时间和内存占用，同时保持全平面分析的准确性。但XTop不支持此技术，因此无法应用。",
       "chunk_id": "_xtop_faq_v3_0103_0001"
     },
@@ -6589,7 +6593,25 @@
     },
     {
       "id": "kg_Operation_0175",
-      "effect": "设置dont touch后，相关的设计对象（如单元、网络）将被排除在优化和检查之外，这可能影响时序分析的准确性，但能避免对特定部分进行不必要的修改。",
+      "class": "Operation",
+      "name": "XTop 设计环境建立与数据载入",
+      "description": "在XTop中建立工作环境、载入设计及配置时序分析条件的完整初始化流程。步骤包括：1. 启动XTop并创建工作空间；2. 链接参考库（如LEF文件）；3. 导入设计数据（Verilog, DEF）；4. 导入电源域（UPF）；5. 进行MCMM（多角多模）配置，创建场景；6. 链接时序库（.idb）；7. 读入时序数据（包括AOCV等）；8. 执行设计检查。最后提供了可直接运行的示例脚本。",
+      "related_commands": [
+        "create_workspace",
+        "link_reference_library",
+        "define_designs",
+        "import_designs",
+        "import_power_domain",
+        "create_corner",
+        "create_mode",
+        "create_scenario",
+        "link_timing_library",
+        "read_timing_data",
+        "read_aocv",
+        "save_workspace",
+        "check_inst_timing_library"
+      ],
+      "effect": "成功执行此流程后，将在XTop中建立一个完整、可用的设计项目工作空间。所有必要的物理、逻辑、时序、功耗和场景（Scenario）信息均被正确加载和关联，为后续的时序分析、优化（ECO）和调试等操作奠定了基础。用户可以通过保存的工作空间快速恢复工作状态。",
       "chunk_id": "_xtop_training_0010_0001"
     },
     {
@@ -6625,12 +6647,17 @@
     },
     {
       "id": "kg_Operation_0178",
-      "effect": "将电源域信息导入到当前工作区，为后续的电源规划和功耗分析提供基础数据。可能的副作用包括与现有设计数据的冲突或需要重新配置电源相关的约束。",
-      "chunk_id": "_xtop_training_0012_0001"
-    },
-    {
-      "id": "kg_Operation_0179",
-      "effect": "配置MCMM（Multiple Clock Domain）设置，确保时序分析的准确性，可能影响时序约束和多时钟域分析的正确性。",
+      "class": "Operation",
+      "name": "创建/管理工作空间",
+      "description": "在XTop中创建、保存、关闭、重新打开工作空间（Workspace）的具体步骤和注意事项。用户可以通过GUI菜单（Workspace→New...）或命令行（create_workspace，save_workspace等）进行操作。创建时需要指定目录、名称和完整路径。特别强调了当进程异常终止时，需要手动删除工作空间目录下的隐藏锁文件“.lock”才能重新打开；但工作空间被正常打开时切勿删除。另外，提供了一个复制工作空间（并链接时序数据）的实用脚本。",
+      "related_commands": [
+        "create_workspace",
+        "save_workspace",
+        "close_workspace",
+        "open_workspace",
+        "copy_xtop_workspace"
+      ],
+      "effect": "成功创建或打开工作空间后，用户即拥有了一个独立的项目环境，用于管理该设计项目的所有相关数据、配置和中间结果。通过保存工作空间，可以持久化当前状态，便于后续继续工作。正确处理锁文件保证了多用户或异常退出情况下的数据安全和访问控制。复制工作空间功能有助于快速创建项目副本或备份。",
       "chunk_id": "_xtop_training_0012_0001"
     },
     {
@@ -6649,12 +6676,28 @@
     },
     {
       "id": "kg_Operation_0181",
-      "effect": "导入设计数据到XTop工具中，自动构建设计层次结构，并将DEF文件中的site名称映射到LEF中的site定义。若未提供DEF文件，需手动创建设计定义。",
+      "class": "Operation",
+      "name": "导入设计数据",
+      "description": "在XTop中导入设计数据的步骤，包括逻辑网表和物理布局信息。主要操作为：1. 定义设计（define_designs），指定Verilog网表文件（-verilogs）和DEF布局文件（-defs）；2. 设置布局单位映射（set_site_map），将DEF中的单位名称映射到LEF库中定义的标准单位；3. 执行导入（import_designs）。对于层次化设计，如果缺少DEF文件，需要手动创建各子模块的设计定义（create_design_definition）后再导入。",
+      "related_commands": [
+        "define_designs",
+        "set_site_map",
+        "import_designs",
+        "create_design_definition"
+      ],
+      "effect": "成功导入设计数据后，XTop将建立设计的逻辑层次结构和物理布局信息。它会自动根据提供的DEF和Verilog文件构建设计层次，并将物理站点（site）映射到工艺库（LEF）中的标准单元定义。这是后续进行物理感知的时序分析、优化和ECO操作的基础，确保了工具能同时理解设计的网表连接和版图布局。",
       "chunk_id": "_xtop_training_0014_0001"
     },
     {
       "id": "kg_Operation_0182",
-      "effect": "启用postmask ECO模式后，工具将进入ECO（Engineering Change Order）流程，允许对设计进行增量修改，如缓冲器插入、大小调整和时序修复，同时避免对已确认的布局或设计部分进行更改。这有助于在不破坏现有设计的情况下优化时序和信号完整性。副作用可能包括增加的运行时间和潜在的ECO冲突，需要仔细检查报告以确保修改符合设计约束。",
+      "class": "Operation",
+      "name": "配置全局参数",
+      "description": "如何在XTop中通过GUI（Setup → Configure Parameters ...）或命令行（set_parameter）配置影响工具全局运行的各项参数。GUI界面以表格形式列出了参数名、当前值、默认值和描述。示例参数包括：最大线程数（max_thread_number）、是否遵循时序库中的dont_use属性（honor_timing_library_dont_use）、是否遵循标注文件中的dont_touch属性（honor_annotated_dont_touch）、不合理的负松弛阈值（unreasonable_negative_slack）、最大信号完整性延迟变化（max_si）、最大扇出（max_fanout）。用户可按F2键获取选中参数的详细帮助信息。",
+      "related_commands": [
+        "set_parameter",
+        "get_parameter"   
+      ],
+      "effect": "控制XTop的运行时行为，以优化性能、控制优化/分析范围，或根据项目要求进行特定行为微调。例如，设置max_thread_number可控制多核并行以利用多核CPU；设置honor_*参数可保护关键或已定稿的单元不被工具修改；设置unreasonable_negative_slack等可帮助发现和报告异常时序情况。",
       "chunk_id": "_xtop_training_0021_0001"
     },
     {
@@ -6673,11 +6716,27 @@
     },
     {
       "id": "kg_Operation_0184",
+      "class": "Operation",
+      "name": "修复信号完整性（SI）违规",
+      "description": "XTop工具修复信号完整性（SI）违规的功能。其主要目的是在正式的时序ECO之前，通过单元尺寸调整（Gate Sizing）或分割线网（Split Net）的方法，将SI引起的额外延迟（delta delay）降低到用户指定的阈值内。与修复时序规则违规类似，此功能在修复时钟网络上的违规时，也会同步更新建立时间和保持时间。用户可以通过fix_si_violations命令，结合多种选项（如指定缓冲器类型、SI阈值、修复方法、线长阈值、是否仅针对DFF等）来精确控制修复行为。",
+      "related_commands": [
+        "fix_si_violations",
+        "set_parameter max_si"
+      ],
       "effect": "执行该操作后，XTop将使用BUFD4缓冲器来减少信号完整性（SI）的delta delay，使其达到指定的阈值。这可能会对时序和布线产生影响，但不会更新设置和保持时间。",
       "chunk_id": "_xtop_training_0034_0001"
     },
     {
       "id": "kg_Operation_0185",
+      "class": "Operation",
+      "name": "修复毛刺（Glitch）噪声违规",
+      "description": "XTop工具修复噪声毛刺（Glitch）违规的功能。其核心步骤是：首先，需要使用report_scenario_data_for_iceplorer命令并配合-dumpNoise选项来导出SI噪声数据文件（*_si_noise.txt.gz）。随后，XTop可以利用“分割线网（Split Net）”和“单元尺寸调整（Size Cell）”两种方法来修复设计中的噪声毛刺违规。用户可以通过命令查看违规摘要（summarize_glitch_violations）并使用fix_glitch_violations命令，通过插入缓冲器（-buffer）或尺寸调整（-methods {size_cell}）来执行修复。",
+      "related_commands": [
+        "report_scenario_data_for_iceplorer -dumpNoise",
+        "summarize_glitch_violations",
+        "fix_glitch_violations",
+        "set_parameter eco_cell_nominal_sizing_pattern"
+      ],
       "effect": "通过调整单元尺寸来减少或消除噪声毛刺违规，可能增加设计的面积和功耗。",
       "chunk_id": "_xtop_training_0035_0001"
     },
@@ -6697,12 +6756,14 @@
     },
     {
       "id": "kg_Operation_0187",
+      "class": "Operation",
+      "name": "面积优化",
+      "description": "XTop工具的面积优化功能。其核心是，在不引入任何新的时序违规和设计规则违规的前提下，通过移除冗余的缓冲器（Buffer）或对单元进行尺寸缩减（Size Down）来优化芯片的设计面积。用户可以通过设置参数（eco_cell_nominal_sizing_pattern）或命令选项（-pattern）来指定用于尺寸缩减的候选单元命名模式。该命令提供了丰富的选项来控制优化行为，例如，是否仅移除缓冲器（-remove_buffer_only），设置各项时序指标的优化余量（-setup_margin等），以及控制优化力度（-effort）。",
+      "related_commands": [
+        "optimize_design_area",
+        "set_parameter eco_cell_nominal_sizing_pattern"
+      ],
       "effect": "优化设计面积，通过移除缓冲器或减小单元尺寸，可能影响时序和设计规则，需确保不引入违规。更高的effort值会消耗更多CPU时间但优化效果更好。",
-      "chunk_id": "_xtop_training_0039_0001"
-    },
-    {
-      "id": "kg_Operation_0188",
-      "effect": "优化设计面积，通过移除缓冲器或缩小单元尺寸，同时不引入时序和设计规则违规。可能的副作用包括增加CPU时间消耗，尤其是在使用较高effort级别时。",
       "chunk_id": "_xtop_training_0039_0001"
     },
     {
@@ -6730,13 +6791,14 @@
       "chunk_id": "_xtop_training_0041_0001"
     },
     {
-      "id": "kg_Operation_0190",
-      "effect": "减少场景数量，降低内存消耗和运行时间，尤其是对大型设计。可能的副作用是某些场景被丢弃，导致覆盖率下降。",
-      "chunk_id": "_xtop_training_0041_0001"
-    },
-    {
       "id": "kg_Operation_0191",
-      "effect": "生成一个经过修改的SDF文件，用于后仿真的反注释，可能包含时序调整以满足Hold时序要求，但可能影响后续的时序分析准确性。",
+      "class": "Operation",
+      "name": "为后仿生成Hack SDF",
+      "description": "XTop的write_incremental_sdf功能，其核心目的是在物理设计阶段，为希望尽早开始后仿（Post-Simulation）的逻辑设计者，在满足“完全干净”的保持时间（Hold）和尽量修复建立时间（Setup）违规的基础上，快速生成一个“Hack SDF”文件。此SDF文件仅包含因修复操作而变更的延迟信息，用于对门级网表进行后标定，以支持后仿。该过程通过-hold或-setup等选项来分别控制对保持或建立时间进行“Hack”并设置目标值，并可以使用-ignore_data_for_sdf选项来加速数据加载。",
+      "related_commands": [
+        "write_incremental_sdf"
+      ],
+      "effect": "XTop会输出一个SDF（标准延迟格式）文件，该文件仅包含为达到用户指定的保持/建立时间目标而进行修改的单元/线网延迟值，而不涉及未改变的部分。这使逻辑设计者能够使用一个“已进行过关键时序修复”的网表（标上这个SDF）来启动后仿，而无需等待所有时序都完全干净，从而提前了后仿的启动时间，加速了设计流程。",
       "chunk_id": "_xtop_training_0042_0001"
     },
     {
@@ -6809,7 +6871,11 @@
     },
     {
       "id": "kg_Operation_0197",
-      "effect": "允许用户手动分析时序路径，提供更细粒度的控制和自定义分析选项，可能需要更多时间但能更精确地识别和解决时序问题。",
+      "class": "Operation",
+      "name": "时序路径视图",
+      "description": "XTop中的时序路径视图功能。用户可通过双击时序路径表格中的任意一行，弹出路径查看器窗口。主界面包含时序路径表格和路径查看器窗口。路径查看器包含“摘要”和“选项”两个标签页。“摘要”页详细展示了所选路径的各项参数，如起点、终点、场景、类型、单元数量、缓冲器/反相器数量、原始松弛、当前松弛、时钟偏移、线延迟、单元延迟、时钟重汇聚悲观度移除等。“选项”页允许用户自定义路径图的显示内容，如是否显示发射/捕获路径、单元/线网、比例条、显示哪些列等。图中通过颜色高亮关键点：红色表示延迟增量大的点，紫色表示ECO操作触及的点，蓝色表示发射/捕获路径的分支点。",
+      "related_commands": [],
+      "effect": "通过路径视图，工程师可以直观、深入地分析关键时序路径的详细构成，快速定位延迟最大的环节，验证ECO操作的影响，并理解时钟路径的结构。这是进行时序调试、瓶颈分析和ECO方案评估的关键手段。",
       "chunk_id": "_xtop_training_0045_0001"
     },
     {
@@ -6981,7 +7047,7 @@
       "id": "kg_Operation_0209",
       "class": "Operation",
       "name": "Reconnect Pin",
-      "description": "通过右键点击时序路径瓶颈分析表、路径视图或布局中的输入时钟引脚，调整时钟树分支。步骤包括：1. 输入追踪级别并从布局中选择网络；2. 选择源引脚（标记为🎯）并点击“OK”；3. 查看时序结果。",
+      "description": "通过右键点击时序路径瓶颈分析表、路径视图或布局中的输入时钟引脚，调整时钟树分支。步骤包括：1. 输入追踪级别并从布局中选择网络；2. 选择源引脚并点击“OK”；3. 查看时序结果。",
       "related_commands": [
         "reconnect_pin",
         "-design",
@@ -7012,11 +7078,19 @@
     },
     {
       "id": "kg_Operation_0211",
+      "class": "Operation",
+      "name": "撤销ECO操作",
+      "description": "XTop中撤销（Undo）ECO操作的功能。用户可以通过图形界面（ECO Actions窗口）中的“Undo”按钮，或通过命令行执行undo命令，来撤销最近执行的一项或多项ECO操作。图形界面的“History”标签页记录了所有已执行的ECO操作（如移动单元、调整尺寸、插入/移除缓冲器等），方便用户查看和回退。建议最多连续撤销次数不超过32次。",
+      "related_commands": [],
       "effect": "撤销最近的一次ECO操作，恢复到之前的状态。频繁使用可能导致操作历史记录过长，影响性能。",
       "chunk_id": "_xtop_training_0060_0001"
     },
     {
       "id": "kg_Operation_0212",
+      "class": "Operation",
+      "name": "线长违规概览与调试",
+      "description": "XTop中通过“优化 -> 违规概览 -> 线长”菜单查看和分析线长（Wire Length）违规的流程与界面。流程始于数据准备，包含自动分析、手动分析和ECO输出与质量评估。用户可通过菜单打开线长摘要窗口，该窗口以表格形式列出各场景的线长违规统计，如违规数量、最差值和总负松弛。界面提供了“跳转至失败原因调试窗口”和“右键菜单 -> 在版图中定位”的功能，便于用户深入分析具体违规的根本原因，并在版图视图（Layout）中直观地定位问题线网，为进一步的自动或手动ECO优化提供依据。",
+      "related_commands": [],
       "effect": "执行该操作后，工具将自动识别并修复布线长度违规问题，可能调整布线路径或优化布局，从而改善时序性能（TNS）。但可能引入新的设计问题或影响其他约束条件。",
       "chunk_id": "_xtop_training_0066_0001"
     },
@@ -7051,13 +7125,14 @@
     },
     {
       "id": "kg_Operation_0216",
+      "class": "Operation",
+      "name": "路径违规摘要",
+      "description": "XTop的summarize_path_violations命令，该命令用于生成指定时序路径的违规信息摘要。执行后，会以表格形式分别输出建立时间（setup）和保持时间（hold）的路径（path）和端点（endpoint）的违规统计，包括违规数量、最差负松弛（WNS）和总负松弛（TNS），并按不同场景（scenario）分类。该命令提供多种选项，如-with_top_n用于报告最差的N个违例，-as_reference和-with_delta、-with_reference结合使用可比较不同阶段（如优化前后）的违例变化。",
+      "related_commands": [
+        "summarize_path_violations"
+      ],
       "effect": "设置当前的摘要作为后续摘要的参考基准，用于比较后续摘要与当前摘要的差异，可能影响后续使用-with_delta或-with_reference选项时的对比结果。",
       "chunk_id": "_xtop_training_0073_0001"
-    },
-    {
-      "id": "kg_Operation_0217",
-      "error": "未找到与“启用postmask ECO模式”相关的操作说明。文档内容中仅涉及summarize_gba_violations命令及其选项，未提及任何关于启用postmask ECO模式的信息。",
-      "chunk_id": "_xtop_training_0074_0001"
     },
     {
       "id": "kg_Operation_0218",
@@ -7102,18 +7177,26 @@
       "chunk_id": "_xtop_training_0078_0001"
     },
     {
-      "id": "kg_Operation_0220",
-      "effect": "该操作会生成一个包含前10大wire length violation的摘要信息，帮助用户快速定位和分析最严重的布线长度违规问题。这可能有助于优化设计，但可能会忽略较小的违规项，需要结合其他分析进行综合判断。",
-      "chunk_id": "_xtop_training_0078_0001"
-    },
-    {
       "id": "kg_Operation_0221",
+      "class": "Operation",
+      "name": "报告优化失败原因",
+      "description": "XTop的report_fail_reasons命令，该命令用于报告在时序优化过程中，对指定路径或引脚（Pin）执行特定操作（如插入缓冲器、调整单元尺寸等）失败的根本原因。它提供了多种报告格式：统计摘要模式（-stats）可列出各种失败原因的数量和百分比；详细模式（-verbose）会在统计摘要后列出每个具体失败的对象及其详细时序信息；路径/引脚分析模式会以表格形式列出关键路径上每个引脚的具体失败原因和可行的修复措施（如可插入的缓冲器类型）。",
+      "related_commands": [
+        "report_fail_reasons",
+        "get_paths",
+        "get_critical_gba_path",
+        "get_setup_gba_violated_pins"
+      ],
       "effect": "生成关于优化过程中失败原因的报告，帮助分析和解决约束冲突问题。可能的副作用包括增加设计复杂性或需要进一步调整约束条件。",
       "chunk_id": "_xtop_training_0085_0001"
     },
     {
       "id": "kg_Operation_0222",
-      "effect": "放大视图以更详细地查看布局中的特定区域，可能使部分细节更清晰但会缩小整体视野。",
+      "class": "Operation",
+      "name": "版图查看器",
+      "description": "该幻灯片展示了XTop集成版图查看器（Layout Viewer）的用户界面和主要功能。它提供了交互式查看设计物理布局的能力，包含基本的视图控制工具，如放大、缩小、适应窗口、选择、标尺测量。支持高亮显示功能，包括选择高亮颜色、对特定对象进行高亮，以及清除高亮。其他配置选项包括清除标尺、启用淡化模式、显示引脚连接等。界面还包含设置和常见问题（FAQ）入口。用户可通过菜单（Layout -> Snapshot）将当前视图保存为图片。",
+      "related_commands": [],
+      "effect": "版图查看器为物理设计工程师提供了可视化设计版图的强大工具。它使得工程师可以直观地观察单元布局、布线、时钟树结构等，并能高亮显示由时序分析工具（如XTop）识别出的关键路径、违例点、优化对象等。结合标尺测量和高亮功能，工程师可以快速定位物理瓶颈（如长连线、拥塞区域），验证ECO操作的物理可行性，并进行深入的物理感知调试，从而做出更准确的优化决策。",
       "chunk_id": "_xtop_training_0090_0001"
     },
     {
@@ -7166,11 +7249,6 @@
       "chunk_id": "_xtop_training_0090_0001"
     },
     {
-      "id": "kg_Operation_0227",
-      "effect": "允许用户在布局视图中可视化和管理引脚连接，可能影响布局的可读性和调试效率。",
-      "chunk_id": "_xtop_training_0090_0001"
-    },
-    {
       "id": "kg_Operation_0228",
       "class": "Operation",
       "name": "Save Snapshot",
@@ -7183,7 +7261,13 @@
     },
     {
       "id": "kg_Operation_0229",
-      "effect": "将GUI界面风格设置为Windows样式，这可能影响工具界面的外观和部分交互行为，但不会影响功能实现。",
+      "class": "Operation",
+      "name": "设置首选项",
+      "description": "通过XTop主GUI窗口的“工具 → 首选项...”菜单打开首选项对话框，以配置工具的全局行为和外观。首选项分为“常规”和“版图”两个标签页。“常规”页允许用户设置外部工具（如网页浏览器、PDF阅读器、文本编辑器）、GUI样式（如Windows风格）、标签页位置和字体。“版图”页则提供详细的版图查看器设置，包括选择/高亮/飞线的线宽、滚动步长、缩放比例、显示内容（如单元名称格式、引脚连接、可移除填充物、线网形状）、标尺模式以及多线程支持等。此外，还列出了版图查看器的键盘快捷键。",
+      "related_commands": [
+        "Layout -> Snapshot"
+      ],
+      "effect": "通过自定义首选项，用户可以根据个人习惯和项目需求，优化XTop工具的使用体验和工作效率。例如，设置熟悉的字体和GUI风格可以提高可读性和操作舒适度；调整版图查看器的显示选项和快捷键可以加速物理布局的浏览和分析；关联外部工具便于快速调用；启用多线程可以提升大型版图渲染的响应速度。合理的首选项设置是个人化工作环境、提升生产力的一环。",
       "chunk_id": "_xtop_training_0092_0001"
     },
     {
@@ -7215,11 +7299,6 @@
         "Size: 9"
       ],
       "effect": "控制台字体将更改为Bitstream Vera Sans Mono，字号为9，这将影响所有控制台窗口的显示效果，但不会对其他功能或布局设置产生影响。",
-      "chunk_id": "_xtop_training_0092_0001"
-    },
-    {
-      "id": "kg_Operation_0232",
-      "effect": "设置Highlight为2后，布局视图中选中的对象或相关连接会以高亮方式显示，便于用户在进行布局调整时快速识别关键元素。可能的副作用包括界面响应速度略微下降，尤其是在处理大型设计文件时。",
       "chunk_id": "_xtop_training_0092_0001"
     },
     {
@@ -7343,11 +7422,6 @@
       "chunk_id": "_xtop_training_0095_0001"
     },
     {
-      "id": "kg_Operation_0242",
-      "effect": "XTop会删除GA filler cells，并插入新的单元格，使用GA filler cells填充空白区域。这可能影响布局密度和电气特性，需要确保新插入的单元格符合设计规则。",
-      "chunk_id": "_xtop_training_0095_0001"
-    },
-    {
       "id": "kg_Operation_0243",
       "class": "Operation",
       "name": "使用GA filler cells填充空白区域",
@@ -7401,11 +7475,6 @@
       "chunk_id": "_xtop_training_0104_0001"
     },
     {
-      "id": "kg_Operation_0246",
-      "effect": "允许在时序修复过程中交换正常缓冲器和延迟缓冲器，以优化时序。可能的副作用包括布局变化和需要重新验证时序约束。",
-      "chunk_id": "_xtop_training_0104_0001"
-    },
-    {
       "id": "kg_Operation_0247",
       "class": "Operation",
       "name": "设置eco缓冲器组",
@@ -7431,16 +7500,6 @@
       "chunk_id": "_xtop_training_0110_0001"
     },
     {
-      "id": "kg_Operation_0249",
-      "effect": "启用postmask ECO模式后，工具将在优化过程中考虑后掩模阶段的调整需求，允许在布局布线后的优化中进行必要的调整，如缓冲器插入、尺寸调整等。但可能导致优化过程中出现'too_weak_drive_strength'错误，需要通过调整参数（如eco_size_cell_drive_strength_weaken_ratio）来避免。",
-      "chunk_id": "_xtop_training_0112_0001"
-    },
-    {
-      "id": "kg_Operation_0250",
-      "effect": "设置dont touch后，相关单元或网络将不会被优化工具自动修改，这可以防止意外的布局或布线更改，但可能导致无法解决某些时序问题，如果这些单元或网络需要调整。",
-      "chunk_id": "_xtop_training_0113_0001"
-    },
-    {
       "id": "kg_Operation_0251",
       "class": "Operation",
       "name": "设置eco_gain_threshold",
@@ -7457,6 +7516,12 @@
     },
     {
       "id": "kg_Operation_0252",
+      "class": "Operation",
+      "name": "设置模块的dont touch属性",
+      "description": "set_module_dont_touch命令。此命令用于对指定的一个或多个模块（module）设置或取消“禁止触碰”属性。其作用范围是递归的，即会作用于该模块内部所有层级的单元实例和线网。设置此属性后，该模块及其内部所有元素在后续的ECO优化（如尺寸调整、缓冲器插入/移除、单元移动等）中将受到保护，工具不会对其进行任何自动修改。这通常用于保护已定稿、经过特殊优化或需要保持不变的子模块（如IP、存储器、模拟模块等）。",
+      "related_commands": [
+        "set_module_dont_touch"
+      ],
       "effect": "设置指定模块为dont touch后，所有该模块的实例中的单元和网络将被递归地设置为dont touch，防止工具对其进行修改。这可能会影响后续的优化和布局布线操作，导致相关模块无法被调整或优化。",
       "chunk_id": "_xtop_training_0117_0001"
     },
@@ -7471,11 +7536,6 @@
       ],
       "effect": "执行该操作后，ECO或优化过程将遵循时序库中指定的dont use属性，过滤掉相关单元。这可能影响布局布线过程中对这些单元的使用，避免不符合设计约束的单元被应用。",
       "chunk_id": "_xtop_training_0123_0001"
-    },
-    {
-      "id": "kg_Operation_0254",
-      "error": "未找到与“启用postmask ECO模式”直接相关的内容。文档中提到了post-mask eco作为配置项，但没有明确的操作步骤、命令或效果描述。",
-      "chunk_id": "_xtop_training_0125_0001"
     },
     {
       "id": "kg_Operation_0255",
@@ -7789,8 +7849,7 @@
     },
     {
       "id": "kg_FailReasons_0018",
-      "FailReasons": {
-        "name": "Physical constraint",
+      "name": "Physical constraint",
         "reasons": [
           "Physical placement is not ready while place legalization turned on.",
           "Dont touch pins, cells, or nets.",
@@ -7798,8 +7857,7 @@
           "Failed to place the newly inserted cell due to placement or routing congestion."
         ],
         "description": "Physical constraints refer to the conditions in the design that are related to the physical placement and routing of the circuit. These constraints ensure that the design is physically realizable and meets the necessary placement and routing requirements. When these constraints are violated, the design cannot be properly placed or routed, leading to exceptions during the eco process.",
-        "solution": "To resolve physical constraint issues, ensure that the physical placement is ready before enabling place legalization. Avoid marking pins, cells, or nets as 'dont touch' unless necessary. Complete the routing for splitting nets and address placement or routing congestion by adjusting the design, using congestion-aware placement tools, or modifying the layout to relieve congestion. Use the man command in XTop to get detailed help on specific reasons and solutions."
-      },
+        "solution": "To resolve physical constraint issues, ensure that the physical placement is ready before enabling place legalization. Avoid marking pins, cells, or nets as 'dont touch' unless necessary. Complete the routing for splitting nets and address placement or routing congestion by adjusting the design, using congestion-aware placement tools, or modifying the layout to relieve congestion. Use the man command in XTop to get detailed help on specific reasons and solutions.",
       "chunk_id": "_xtop_ug_0064_0001"
     },
     {
@@ -7935,6 +7993,8 @@
     },
     {
       "id": "kg_FailReasons_0029",
+      "class": "FailReasons",
+      "name": "insert_buffer Command Execution Failure",
       "reasons": [
         "Any of the library cells does not exist.",
         "The timing library cell is not complete for all corners.",
@@ -9243,18 +9303,9 @@
     },
     {
       "id": "kg_FailReasons_0135",
+      "class": "FailReasons",
+      "name": "setup hold 互相卡",
       "reasons": [
-        "setup hold 互相卡",
-        "placement density 过高",
-        "net detour 过大，导致对插入buffer 的delay 估计失真",
-        "Fix hold 在低压corner 下的path 上insert 了很多的delay cell",
-        "Fix hold 之后因为net detour 的原因，setup timing 飞掉了",
-        "Fix hold 之后发现和某个memory 相关的setup timing 飞了"
-      ],
-      "setup hold 互相卡": {
-        "class": "FailReasons",
-        "name": "setup hold 互相卡",
-        "reasons": [
           "setup hold 互相卡",
           "placement density 过高",
           "net detour 过大，导致对插入buffer 的delay 估计失真",
@@ -9262,9 +9313,8 @@
           "Fix hold 之后因为net detour 的原因，setup timing 飞掉了",
           "Fix hold 之后发现和某个memory 相关的setup timing 飞了"
         ],
-        "description": "Q11: 有哪些原因会导致XTop fix hold timing 效果不佳？ A： ① setup hold 互相卡 ② placement density 过高 ③ net detour 过大，导致对插入buffer 的delay 估计失真 Fix hold 之后，导致setup timing 飞掉了，可能会因为： 1. Fix hold 在低压corner 下的path 上insert 了很多的delay cell，导致 setup timing 飞了。通过report_annotated_pin 进行debug，发现有 violation 的pin 上没有voltage 信息，导致对transition 和delay 评估不 准。在dump STA data 的时候dump 了所有pin 的voltage 后问题得以解决。 2. Fix hold 之后，因为net detour 的原因，setup timing 飞掉了。原因是 scan 的tree 不平，工具在一个区域插了很多buffer 和delay cell，导致 绕线detour，transition 变大很多。 3. Fix hold 之后，发现和某个memory 相关的setup timing 飞了。在P*中 report 对应的timing， 发现transition 变大很多。同时在XTop 和innv*中 查看对应的physical view，发现memory 的pin location 改变了。最终替换到最新的LEF 之后，问题得以解决。",
-        "solution": "1. 使用report_annotated_pin命令检查有violation的pin的voltage信息，确保所有pin的voltage信息正确。 2. 在dump STA data时，确保dump所有pin的voltage信息。 3. 检查scan tree的平衡性，避免在某一区域插入过多buffer和delay cell。 4. 检查memory的pin location是否发生变化，替换为最新的LEF文件。"
-      },
+      "description": "Q11: 有哪些原因会导致XTop fix hold timing 效果不佳？ A： ① setup hold 互相卡 ② placement density 过高 ③ net detour 过大，导致对插入buffer 的delay 估计失真 Fix hold 之后，导致setup timing 飞掉了，可能会因为： 1. Fix hold 在低压corner 下的path 上insert 了很多的delay cell，导致 setup timing 飞了。通过report_annotated_pin 进行debug，发现有 violation 的pin 上没有voltage 信息，导致对transition 和delay 评估不 准。在dump STA data 的时候dump 了所有pin 的voltage 后问题得以解决。 2. Fix hold 之后，因为net detour 的原因，setup timing 飞掉了。原因是 scan 的tree 不平，工具在一个区域插了很多buffer 和delay cell，导致 绕线detour，transition 变大很多。 3. Fix hold 之后，发现和某个memory 相关的setup timing 飞了。在P*中 report 对应的timing， 发现transition 变大很多。同时在XTop 和innv*中 查看对应的physical view，发现memory 的pin location 改变了。最终替换到最新的LEF 之后，问题得以解决。",
+      "solution": "1. 使用report_annotated_pin命令检查有violation的pin的voltage信息，确保所有pin的voltage信息正确。 2. 在dump STA data时，确保dump所有pin的voltage信息。 3. 检查scan tree的平衡性，避免在某一区域插入过多buffer和delay cell。 4. 检查memory的pin location是否发生变化，替换为最新的LEF文件。",
       "chunk_id": "_xtop_faq_v3_0069_0001"
     },
     {
@@ -9373,8 +9423,15 @@
     },
     {
       "id": "kg_FailReasons_0144",
-      "reasons": null,
-      "description": null,
+      "class": "FailReasons",
+      "name": "ECO Failure Reasons Debugging",
+      "reasons": [
+        "break_setup (violating setup time)",
+        "break_setup_of_driver (causing driver's setup violation)",
+        "break_max_transition (exceeding max transition limit)",
+        "fail_to_legalize (placement legalization failure)"
+        ],
+      "description": "This slide illustrates the process of debugging why certain ECO (Engineering Change Order) operations fail in XTop. Users can navigate through the GUI via Optimization -> Fail Reason​ to access a summary table that categorizes and quantifies failure reasons (e.g., 'break_setup', 'break_max_transition', 'fail_to_legalize'), showing their counts and percentages. From this summary, users can double-click on a specific reason to view detailed instances or use the right-click menu to locate the failure directly in the layout view for visual inspection. The underlying flow involves data preparation, analysis (auto and manual), and ECO output with Quality of Results (QoR) assessment. The command clear_fail_reasonsis available to reset the failure reason records.",
       "solution": "Command \"clear_fail_reasons\" can be used to clear all existing fail reasons.",
       "chunk_id": "_xtop_training_0070_0001"
     },
@@ -9421,19 +9478,9 @@
     },
     {
       "id": "kg_FailReasons_0148",
+      "class": "FailReasons",
+      "name": "break max cap",
       "reasons": [
-        "break max cap",
-        "no setup gain",
-        "break hold of driver",
-        "no place to legalize",
-        "sequential_cell",
-        "no_setup_gain",
-        "break_hold"
-      ],
-      "break max cap": {
-        "class": "FailReasons",
-        "name": "break max cap",
-        "reasons": [
           "break max cap",
           "no setup gain",
           "break hold of driver",
@@ -9442,29 +9489,21 @@
           "no_setup_gain",
           "break_hold"
         ],
-        "description": "The reason for the failure is related to the maximum capacitance of the pin being exceeded, which can occur due to various factors such as the pin's capacitance being too high for the driver, the setup gain not being sufficient, the hold of the driver being broken, the lack of space to legalize the placement, the use of a sequential cell, or the absence of setup gain.",
-        "solution": "To resolve this issue, you can use the report_fail_reasons command with the -paths option to identify the specific paths and pins affected. For example: xtop > report_fail_reasons -paths [get_paths -delay_type max] -stats. Additionally, you can use the -pins option to focus on specific pins that are violating the constraints, such as: xtop > report_fail_reasons -pins [get_setup_gba_violated_pins] -stats -verbose. Once identified, you can use the Insert Buffer, Size Cell, Split Net, or Remove Buffer options to adjust the design and meet the capacitance requirements."
-      },
-      "chunk_id": "_xtop_training_0085_0001"
-    },
-    {
-      "id": "kg_FailReasons_0149",
-      "reasons": [
-        "break hold of driver",
-        "break_hold",
-        "break hold",
-        "break hold of driver",
-        "break_hold"
-      ],
-      "Class": "FailReasons",
-      "name": "break hold",
-      "description": "详细解释",
-      "solution": "xtop > report_fail_reasons -paths [get_paths -delay_type max] -stats",
+      "description": "The reason for the failure is related to the maximum capacitance of the pin being exceeded, which can occur due to various factors such as the pin's capacitance being too high for the driver, the setup gain not being sufficient, the hold of the driver being broken, the lack of space to legalize the placement, the use of a sequential cell, or the absence of setup gain.",
+      "solution": "To resolve this issue, you can use the report_fail_reasons command with the -paths option to identify the specific paths and pins affected. For example: xtop > report_fail_reasons -paths [get_paths -delay_type max] -stats. Additionally, you can use the -pins option to focus on specific pins that are violating the constraints, such as: xtop > report_fail_reasons -pins [get_setup_gba_violated_pins] -stats -verbose. Once identified, you can use the Insert Buffer, Size Cell, Split Net, or Remove Buffer options to adjust the design and meet the capacitance requirements.",
       "chunk_id": "_xtop_training_0085_0001"
     },
     {
       "id": "kg_FailReasons_0150",
-      "error": "no_transition_gain",
+      "class": "FailReasons",
+      "name": "Optimization Gain Threshold Setting",
+      "reasons": [
+      "No_hold_gain (insufficient hold timing improvement)",
+      "No_setup_gain (insufficient setup timing improvement)",
+      "No_transition_gain (insufficient transition time improvement)"
+      ],
+      "description": "This slide explains the eco_gain_thresholdparameter, which sets the minimum acceptable timing improvement (gain) required for an ECO operation (e.g., cell sizing or buffer insertion) to be considered valid and applied. The unit is nanoseconds (ns). If the estimated improvement from a candidate ECO action is less than this threshold, the action will be rejected, and a corresponding fail reason (e.g., no_setup_gain) will be recorded. This parameter is primarily used for setup, hold, and transition fixes but is ignored by the split_netoptimization method.",
+      "solution": "1. Set the Parameter: Use set_parameter eco_gain_threshold <value>to define the minimum gain, e.g., set_parameter eco_gain_threshold 0.01for a 10ps threshold.\n2. Apply in Optimization: Run the relevant fix commands (e.g., fix_setup_gba_violations, fix_hold_violations). Actions providing gains below the threshold will be skipped.\n3. Debug Failures: If optimizations fail with reasons like no_setup_gain, review the current eco_gain_thresholdvalue. Consider lowering it (e.g., to 0.005) to allow smaller improvements if the design is highly constrained, or analyze if the chosen optimization method (size_cell/insert_buffer) is ineffective for the path.\n4. Method Selection: Note that split_netoperations ignore this parameter. If gains are consistently below the threshold, evaluate if split_netor other methods are more suitable.",
       "chunk_id": "_xtop_training_0113_0001"
     },
     {
@@ -9711,15 +9750,10 @@
     },
     {
       "id": "kg_File_0030",
+      "class": "File",
+      "name": "iming library files",
       "usage": "Timing library files are linked to the specified corner. By default, the library is used for both min and max analysis in this corner. LVF libraries for advanced process are supported. Use command unlink_timing_library to unlink timing library files from specified corner. The command xtop> link_timing_library -corner cornerName \\ [-search_type min|max|min_max] files is used to link the timing library files.",
       "chunk_id": "_xtop_ug_0021_0001"
-    },
-    {
-      "id": "kg_File_0031",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_ug_0053_0001"
     },
     {
       "id": "kg_File_0032",
@@ -9732,13 +9766,6 @@
         "_xtop_training_0074_0001",
         "_xtop_training_0089_0001"
       ]
-    },
-    {
-      "id": "kg_File_0033",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_ug_0057_0001"
     },
     {
       "id": "kg_File_0034",
@@ -9756,25 +9783,6 @@
         "_xtop_handbook_0239_0004",
         "_xtop_faq_v3_0116_0001"
       ]
-    },
-    {
-      "id": "kg_File_0035",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_handbook_0050_0001"
-    },
-    {
-      "id": "kg_File_0036",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_handbook_0050_0001"
-    },
-    {
-      "id": "kg_File_0037",
-      "usage": "记录设置电源轨电压的命令和参数，用于静态时序分析（STA）中定义不同场景、角落和模式下的电压值。通过该文件可以查看和验证设计中各个单元在不同条件下的电压设置情况。",
-      "chunk_id": "_xtop_handbook_0050_0001"
     },
     {
       "id": "kg_File_0038",
@@ -9814,23 +9822,11 @@
       "chunk_id": "_xtop_handbook_0069_0001"
     },
     {
-      "id": "kg_File_0042",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_handbook_0108_0001"
-    },
-    {
       "id": "kg_File_0043",
       "class": "File",
       "name": "region_file",
       "usage": "定义电源域和物理区域之间的映射关系，用于导入电源域配置时指定电源域与物理区域的对应关系。该文件在import_power_domain命令中使用，与UPF文件一起或单独使用以配置电源域信息。",
       "chunk_id": "_xtop_handbook_0118_0001"
-    },
-    {
-      "id": "kg_File_0044",
-      "usage": "读取时序数据文件，用于分析和验证设计的时序特性。文件由STA工具生成，包含预定义命名格式的文件，包含每个场景的时序数据。使用read_timing_data命令从指定目录读取，需要所有必要的文件存在，否则报告错误。可选参数包括忽略时序报告、内存节省模式等。",
-      "chunk_id": "_xtop_handbook_0127_0001"
     },
     {
       "id": "kg_File_0045",
@@ -9861,13 +9857,6 @@
       "chunk_id": "_xtop_handbook_0128_0001"
     },
     {
-      "id": "kg_File_0049",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_handbook_0134_0003"
-    },
-    {
       "id": "kg_File_0050",
       "class": "File",
       "name": "def/sub_design.def.gz",
@@ -9880,11 +9869,6 @@
       "name": "image_file_name",
       "usage": "用于生成图像文件，以可视化网络的断开部分。当网络存在多个断开部分时，该文件会用不同颜色标记每个部分，并用圆圈表示网络引脚。",
       "chunk_id": "_xtop_handbook_0146_0001"
-    },
-    {
-      "id": "kg_File_0052",
-      "usage": "文件用途，描述这个文件包含什么内容、如何使用",
-      "chunk_id": "_xtop_handbook_0149_0002"
     },
     {
       "id": "kg_File_0053",
@@ -9922,32 +9906,6 @@
       "chunk_id": "_xtop_handbook_0200_0001"
     },
     {
-      "id": "kg_File_0058",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_handbook_0206_0001"
-    },
-    {
-      "id": "kg_File_0059",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_handbook_0213_0006"
-    },
-    {
-      "id": "kg_File_0060",
-      "usage": "文件包含设计中实例位移的信息，包括最大、最小、平均位移，以及按距离排序的实例名称和位置信息。用于分析芯片设计中单元的物理位移情况，帮助识别可能的布局问题。",
-      "chunk_id": "_xtop_handbook_0218_0002"
-    },
-    {
-      "id": "kg_File_0061",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_handbook_0219_0001"
-    },
-    {
       "id": "kg_File_0062",
       "class": "File",
       "name": "verilog",
@@ -9964,13 +9922,6 @@
       "name": "incremental def file",
       "usage": "包含设计更改，用于在写入设计更改时生成增量DEF文件，通常与其他文件（如verilog文件）一起使用以记录设计的当前状态。通过write_design_changes命令生成，使用-format V_DEF参数指定。",
       "chunk_id": "_xtop_handbook_0225_0004"
-    },
-    {
-      "id": "kg_File_0064",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_handbook_0239_0004"
     },
     {
       "id": "kg_File_0065",
@@ -10039,11 +9990,6 @@
       "chunk_id": "_xtop_faq_v3_0026_0001"
     },
     {
-      "id": "kg_File_0074",
-      "usage": "用于存储时序库数据，通过转换.lib文件生成，以加速时序库文件的导入过程。使用lib2idb工具进行转换，转换后的.idb文件可以按照.lib文件的方式导入，但此方法仅加速时序库导入，不适用于STA数据导入加速。",
-      "chunk_id": "_xtop_faq_v3_0026_0001"
-    },
-    {
       "id": "kg_File_0075",
       "class": "File",
       "name": "sta_data/cpu_data_timing_rpt.txt",
@@ -10051,12 +9997,9 @@
       "chunk_id": "_xtop_faq_v3_0027_0001"
     },
     {
-      "id": "kg_File_0076",
-      "usage": "文件包含时序报告信息，用于增量读入时序数据。使用read_timing_report命令指定scenario参数读取，例如：xtop> read_timing_report -scenario fast_worst sta_data/cpu_data_timing_rpt.txt。读取前建议使用purge_timing_paths清空当前数据，防止数据冲突。默认scenario为reference。",
-      "chunk_id": "_xtop_faq_v3_0027_0001"
-    },
-    {
       "id": "kg_File_0077",
+      "class": "File",
+      "name": "timing data",
       "usage": "文件包含时序数据，用于在XTop中读取和验证时序信息。通过检查文件头部的design和current inst名称以及反标率，确保时序数据与netlist匹配。",
       "chunk_id": "_xtop_faq_v3_0028_0001"
     },
@@ -10073,18 +10016,6 @@
       "name": "timing_rpt file",
       "usage": "文件包含与定时数据相关的信息，用于检查和诊断timing_data文件中的异常，例如输入端口前面的pin到该端口的delay信息。在出现错误时，需要查看该文件中log提示的行以确定问题原因。",
       "chunk_id": "_xtop_faq_v3_0032_0001"
-    },
-    {
-      "id": "kg_File_0080",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_faq_v3_0039_0001"
-    },
-    {
-      "id": "kg_File_0081",
-      "usage": "用于在ECO时序优化前保存当前工作区，以便后续需要时可以恢复到该状态。用户可以在read_timing_data后、ECO之前使用save_workspace -as命令进行保存。",
-      "chunk_id": "_xtop_faq_v3_0057_0001"
     },
     {
       "id": "kg_File_0082",
@@ -10130,23 +10061,24 @@
     },
     {
       "id": "kg_File_0088",
+      "class": "File",
+      "name": "LEF Files",
       "usage": "LEF Files are used to define the physical layout information of the design, including technology LEF, standard cells, and macros. They are essential for floorplanning and placement during the physical design process.",
       "chunk_id": "_xtop_training_0004_0001"
     },
     {
       "id": "kg_File_0089",
+      "class": "File",
+      "name": "DEF Files",
       "usage": "DEF Files are used for physical design and layout information, such as placement, routing, and other physical design data. They are used in the physical design flow to represent the layout of the design.",
-      "chunk_id": "_xtop_training_0004_0001"
+      "chunk_id": ["_xtop_training_0004_0001", "_xtop_training_0006_0001"]
     },
     {
       "id": "kg_File_0090",
+      "class": "File",
+      "name": "Lib Files",
       "usage": "the timing lib files (from foundry)",
       "chunk_id": "_xtop_training_0004_0001"
-    },
-    {
-      "id": "kg_File_0091",
-      "usage": "DEF Files are used in the context of required files, which suggests they contain information necessary for the design process, possibly related to physical design or layout data. However, the specific content and usage details are not explicitly described in the provided document.",
-      "chunk_id": "_xtop_training_0006_0001"
     },
     {
       "id": "kg_File_0092",
@@ -10166,21 +10098,11 @@
       "chunk_id": "_xtop_training_0006_0001"
     },
     {
-      "id": "kg_File_0094",
-      "usage": "用于时序库，包含时序数据，推荐将大型CCS格式的.lib文件转换为.idb格式以提高读取速度。",
-      "chunk_id": "_xtop_training_0006_0001"
-    },
-    {
       "id": "kg_File_0095",
       "class": "File",
       "name": "func_fast_data_si_delta.txt.gz",
       "usage": "文件包含与功能快速模式下的信号完整性延迟相关的数据，用于分析和优化信号完整性问题。在使用STA工具时，通过执行特定命令生成该文件，该文件可被XTop用于基于路径松弛度的eco操作。",
       "chunk_id": "_xtop_training_0007_0001"
-    },
-    {
-      "id": "kg_File_0096",
-      "usage": "文件func_fast_data_timing_rpt.txt.gz是时序数据文件的一部分，用于存储与时序相关的报告信息。该文件在Turbo Mode下生成，用于快速处理大型设计中的少量建立/保持违规问题。文件内容包含时序分析结果，可用于XTop工具进行时序修复和分析。使用时需在STA工具中源 turbo-mode 脚本，然后运行命令准备时序数据。",
-      "chunk_id": "_xtop_training_0008_0001"
     },
     {
       "id": "kg_File_0097",
@@ -10204,61 +10126,11 @@
       "chunk_id": "_xtop_training_0047_0001"
     },
     {
-      "id": "kg_File_0100",
-      "usage": "用于在设计中插入缓冲器链以修复时序问题，包含缓冲器列表、指定延迟、调整顺序后的时序结果及布局视图中的新缓冲器信息。通过右键点击瓶颈分析表、路径视图或布局中的引脚触发，命令行指令示例为xtop> insert_buffer -design {cpu} {alu/U137/I} {BUFFD0EPHVT BUFFD6EP BUFFD12EP BUFFD16EPLVT }。",
-      "chunk_id": "_xtop_training_0050_0001"
-    },
-    {
-      "id": "kg_File_0101",
-      "usage": "用于在设计中插入缓冲器链以修复时序问题，包含通过缓冲器列表或指定延迟添加缓冲器链的步骤，调整缓冲器顺序以影响时序，以及查看时序结果和布局中的新缓冲器。",
-      "chunk_id": "_xtop_training_0050_0001"
-    },
-    {
-      "id": "kg_File_0102",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_training_0053_0001"
-    },
-    {
-      "id": "kg_File_0103",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_training_0055_0001"
-    },
-    {
       "id": "kg_File_0104",
       "class": "File",
       "name": "Layout View (cpu)",
       "usage": "Shows a graphical representation of the layout with cells and connections. A purple arrow indicates the movement of a cell. The distance is displayed as (-15.360, 12.160). After moving, purple lines indicate new connections.",
       "chunk_id": "_xtop_training_0056_0001"
-    },
-    {
-      "id": "kg_File_0105",
-      "usage": "显示当前执行的操作（移动单元），展示被移动单元的详细信息，包括原始坐标、新坐标、移动距离和布局信息，用于在物理设计中调整单元位置并观察对时序的影响。",
-      "chunk_id": "_xtop_training_0056_0001"
-    },
-    {
-      "id": "kg_File_0106",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_training_0074_0001"
-    },
-    {
-      "id": "kg_File_0107",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_training_0074_0001"
-    },
-    {
-      "id": "kg_File_0108",
-      "class": "File",
-      "name": null,
-      "usage": null,
-      "chunk_id": "_xtop_training_0075_0001"
     },
     {
       "id": "kg_File_0109",
