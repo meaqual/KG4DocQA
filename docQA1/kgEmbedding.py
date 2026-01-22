@@ -19,7 +19,7 @@ DATABASE_PATH = "/mnt/public/sichuan_a/hyh/queryTest1/qaSchema/xtopDoc/docQA1/da
 # 测试问题路径
 BENCHMARK_PATH = "/mnt/public/sichuan_a/hyh/queryTest1/qaSchema/xtopDoc/docQA1/testData/gt_benchmark.json"
 # 输出结果路径
-OUTPUT_PATH = "/mnt/public/sichuan_a/hyh/queryTest1/qaSchema/xtopDoc/docQA1/results/retrieval_results.txt"
+OUTPUT_PATH = "/mnt/public/sichuan_a/hyh/queryTest1/qaSchema/xtopDoc/docQA1/results/kgEmbedding_results.txt"
 
 
 # ============ Embedding ============
@@ -229,9 +229,6 @@ if __name__ == "__main__":
                 out_file.write("\n")
             
             out_file.write("\n")
-            
-            # 同时打印到控制台
-            # print(f"\n [{question_id}] {query}")
     
     print("\n" + "=" * 60)
     print(f"结果已保存到: {OUTPUT_PATH}")

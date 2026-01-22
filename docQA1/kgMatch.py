@@ -5,6 +5,7 @@ KG 实例名匹配检索器 - 基于正则/字符串匹配
 无需向量数据库，直接匹配 query 中是否包含 KG 实例名
 """
 
+import os
 import re
 import json
 from pathlib import Path
@@ -13,7 +14,17 @@ from dataclasses import dataclass, field
 from collections import defaultdict
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '5'
-# ============ 全局配置 ============
+
+# ============ 路径配置 ============
+# 数据库路径
+DATABASE_PATH = "/mnt/public/sichuan_a/hyh/queryTest1/qaSchema/xtopDoc/docQA1/dataBase/textContent.json"
+# 测试问题路径
+BENCHMARK_PATH = "/mnt/public/sichuan_a/hyh/queryTest1/qaSchema/xtopDoc/docQA1/testData/gt_benchmark.json"
+# 输出结果路径
+OUTPUT_PATH = "/mnt/public/sichuan_a/hyh/queryTest1/qaSchema/xtopDoc/docQA1/results/kgMatch_results.txt"
+
+
+# ============ 匹配器配置 ============
 MATCHER_CONFIG = {
     # 匹配模式: "regex" | "exact" | "fuzzy"
     "MATCH_MODE": "regex",
@@ -152,7 +163,7 @@ class KGInstanceMatcher:
         初始化匹配器
         
         Args:
-            kg_data: KG 数据字典 {id: content}
+            kg_data: KG 数据字典 {content: id} 或 {id: content}
             kg_file_path: KG 数据文件路径
             config: 配置覆盖
             verbose: 是否打印详细信息
@@ -171,22 +182,60 @@ class KGInstanceMatcher:
         else:
             raise ValueError("必须提供 kg_data 或 kg_file_path")
         
+        # 转换数据格式为 {id: content}
+        self.kg_data = self._normalize_data(self.kg_data)
+        
         # 构建实例索引
         self.instances: List[KGInstance] = []
         self.name_to_instance: Dict[str, List[KGInstance]] = defaultdict(list)
         self._build_index()
         
         if self.verbose:
-            print(f"✅ KG 实例匹配器初始化完成")
+            print(f"KG 实例匹配器初始化完成")
             print(f"   - 实例数量: {len(self.instances)}")
             print(f"   - 名称数量: {len(self.name_to_instance)}")
     
     def _load_kg_file(self, path: str) -> Dict[str, str]:
         """加载 KG 文件"""
         if self.verbose:
-            print(f"📦 加载 KG 文件: {path}")
+            print(f"加载 KG 文件: {path}")
         with open(path, 'r', encoding='utf-8') as f:
             return json.load(f)
+    
+    def _normalize_data(self, data: Dict[str, str]) -> Dict[str, str]:
+        """
+        标准化数据格式为 {id: content}
+        
+        输入可能是:
+        - {content: id} 格式 (buildDatabase.py 输出)
+        - {id: content} 格式
+        """
+        if not data:
+            return {}
+        
+        # 检查第一个 key 是否像 ID（以 kg_ 或数字开头）
+        first_key = next(iter(data.keys()))
+        first_value = data[first_key]
+        
+        # 如果 key 看起来像内容（较长的文本），value 看起来像 ID
+        # 则需要翻转
+        if len(first_key) > 50 or (
+            isinstance(first_value, str) and 
+            (first_value.startswith("kg_") or first_value[0].isdigit())
+        ):
+            if self.verbose:
+                print("   检测到 {content: id} 格式，正在转换...")
+            # 翻转：{content: id} -> {id: content}
+            normalized = {}
+            for content, ids in data.items():
+                # ids 可能是 "id1, id2, id3" 格式
+                for id_str in ids.split(", "):
+                    id_str = id_str.strip()
+                    if id_str:
+                        normalized[id_str] = content
+            return normalized
+        
+        return data
     
     def _build_index(self):
         """构建名称索引"""
@@ -400,6 +449,36 @@ class KGInstanceMatcher:
         
         return results[:MATCHER_CONFIG["MAX_RESULTS"]]
     
+    def retrieve(
+        self,
+        query: str,
+        topk: int = 5,
+        mode: str = None,
+    ) -> List[Dict]:
+        """
+        检索接口（与 kgEmbedding 保持一致）
+        
+        Args:
+            query: 查询文本
+            topk: 返回结果数量
+            mode: 匹配模式
+            
+        Returns:
+            结果列表，每个元素包含 id, content, score
+        """
+        results = self.match(query, mode=mode)
+        
+        return [
+            {
+                "id": r.id,
+                "content": r.content,
+                "score": r.score,
+                "match_type": r.match_type,
+                "matched_name": r.name,
+            }
+            for r in results[:topk]
+        ]
+    
     def batch_match(
         self, 
         queries: List[str],
@@ -425,11 +504,11 @@ class KGInstanceMatcher:
 def print_match_results(query: str, results: List[MatchResult], max_show: int = 10):
     """打印匹配结果"""
     print(f"\n{'='*70}")
-    print(f"📌 Query: {query}")
+    print(f"Query: {query}")
     print(f"   匹配数量: {len(results)}")
     
     if not results:
-        print("   ❌ 无匹配结果")
+        print("   无匹配结果")
         return
     
     for i, r in enumerate(results[:max_show], 1):
@@ -444,135 +523,74 @@ def print_match_results(query: str, results: List[MatchResult], max_show: int = 
         print(f"\n   ... 还有 {len(results) - max_show} 个结果")
 
 
-# ============ 示例 KG 数据 ============
-SAMPLE_KG_DATA = {
-    "kg_Command_0001": "set_max_transition value [-clock] [-data] | 设置最大转换时间约束，用于控制信号上升/下降时间",
-    "kg_Command_0002": "report_timing [-from] [-to] [-max_paths n] | 报告时序路径信息，显示关键路径的详细时序分析结果",
-    "kg_Command_0003": "set_max_fanout value object_list | 设置最大扇出约束，限制单个驱动器驱动的负载数量",
-    "kg_Command_0004": "report_clock_timing | 报告时钟路径的时序信息，包括时钟延迟和偏斜",
-    "kg_Command_0005": "set_clock_uncertainty value | 设置时钟不确定性，包括抖动和偏斜的裕量",
-    "kg_Command_0006": "get_ports [-filter] | 获取设计中的端口列表",
-    "kg_Command_0007": "create_clock -period value -name name [source] | 创建时钟定义",
-    "kg_Command_0008": "set_input_delay -clock clk delay port_list | 设置输入延迟约束",
-    "kg_Command_0009": "set_output_delay -clock clk delay port_list | 设置输出延迟约束",
-    "kg_Command_0010": "compile_ultra | 执行高级综合优化",
-    "kg_Concept_0001": "setup slack 表示数据信号到达时间与时钟边沿之间的裕量，正值表示满足时序要求",
-    "kg_Concept_0002": "hold time violation (保持时间违规) 表示数据保持时间不足",
-    "kg_Concept_0003": "clock skew (时钟偏斜) 是时钟信号到达不同寄存器的时间差异",
-    "kg_Concept_0004": "关键路径 (critical path) 是设计中时序裕量最小的路径",
-    "kg_Concept_0005": "时钟树综合 (CTS - Clock Tree Synthesis) 是将时钟信号均匀分布到所有时序单元的过程",
-    "kg_Concept_0006": "WNS (Worst Negative Slack) 最差负裕量，表示设计中最严重的时序违规程度",
-    "kg_Concept_0007": "TNS (Total Negative Slack) 总负裕量，所有时序违规路径的裕量之和",
-    "kg_Concept_0008": "fanout 扇出，指一个驱动器驱动的负载数量",
-}
-
-
-# ============ 示例查询 ============
-SAMPLE_QUERIES = [
-    "如何使用 set_max_transition 设置转换时间约束",
-    "report_timing 命令的用法是什么",
-    "什么是 setup slack 和 hold time violation",
-    "如何解决 clock skew 问题",
-    "compile_ultra 和 report_clock_timing 有什么区别",
-    "set_input_delay 和 set_output_delay 怎么设置",
-    "WNS 和 TNS 分别是什么意思",
-    "create_clock 创建时钟的参数有哪些",
-    "get_ports 如何过滤端口",
-    "时钟树综合 CTS 的基本流程",
-    "fanout 过大会有什么问题",
-    "关键路径优化方法",
-]
-
-
 # ============ 主函数 ============
 def main():
-    """主函数 - 演示 KG 实例名匹配器的使用"""
+    """主函数 - 读取测试数据并输出结果"""
     
-    print("\n" + "=" * 70)
-    print("🚀 KG 实例名匹配器 - 演示")
-    print("=" * 70)
+    print("\n" + "=" * 60)
+    print("KG 实例名匹配检索器")
+    print("=" * 60)
     
     # ========== 1. 初始化匹配器 ==========
     print("\n【1】初始化匹配器")
+    print(f"   数据库路径: {DATABASE_PATH}")
     
-    # 方式1: 使用内置示例数据
-    matcher = KGInstanceMatcher(kg_data=SAMPLE_KG_DATA, verbose=True)
+    matcher = KGInstanceMatcher(
+        kg_file_path=DATABASE_PATH,
+        verbose=True
+    )
     
-    # 方式2: 从文件加载（取消注释使用）
-    # matcher = KGInstanceMatcher(
-    #     kg_file_path="merged_classes_with_id_database.json",
-    #     verbose=True
-    # )
+    # ========== 2. 加载测试问题 ==========
+    print(f"\n【2】加载测试问题: {BENCHMARK_PATH}")
+    with open(BENCHMARK_PATH, 'r', encoding='utf-8') as f:
+        benchmark_data = json.load(f)
+    print(f"   加载完成: {len(benchmark_data)} 个问题")
     
-    # 方式3: 自定义配置
-    # custom_config = {
-    #     "MATCH_MODE": "exact",
-    #     "CASE_SENSITIVE": False,
-    #     "MIN_NAME_LENGTH": 3,
-    # }
-    # matcher = KGInstanceMatcher(kg_data=SAMPLE_KG_DATA, config=custom_config)
+    # ========== 3. 确保输出目录存在 ==========
+    output_dir = Path(OUTPUT_PATH).parent
+    output_dir.mkdir(parents=True, exist_ok=True)
     
-    # ========== 2. 查看所有提取的名称 ==========
-    print("\n【2】所有提取的实例名称")
-    all_names = matcher.get_all_names()
-    print(f"   共 {len(all_names)} 个名称:")
-    for name in sorted(all_names)[:20]:  # 只显示前20个
-        print(f"      - {name}")
-    if len(all_names) > 20:
-        print(f"      ... 还有 {len(all_names) - 20} 个")
+    # ========== 4. 执行检索并保存结果 ==========
+    print("\n" + "=" * 60)
+    print("【3】开始检索测试")
+    print("=" * 60)
     
-    # ========== 3. 搜索特定名称 ==========
-    print("\n【3】搜索名称（正则匹配）")
-    pattern = "set_.*"
-    matched_names = matcher.search_names(pattern)
-    print(f"   模式 '{pattern}' 匹配到:")
-    for name in matched_names:
-        print(f"      - {name}")
+    with open(OUTPUT_PATH, 'w', encoding='utf-8') as out_file:
+        for item in benchmark_data:
+            question_id = item.get("id", "N/A")
+            query = item.get("question", "")
+            
+            if not query:
+                continue
+            
+            # 执行检索
+            results = matcher.retrieve(
+                query=query,
+                topk=5,
+                mode="regex"
+            )
+            
+            # 写入文件
+            out_file.write("=" * 80 + "\n")
+            out_file.write(f"ID: {question_id}\n")
+            out_file.write(f"Question: {query}\n")
+            out_file.write("-" * 80 + "\n")
+            out_file.write(f"检索结果数量: {len(results)}\n")
+            out_file.write(f"结果ID列表: {[r['id'] for r in results]}\n")
+            out_file.write("-" * 80 + "\n")
+            
+            for i, r in enumerate(results, 1):
+                out_file.write(f"[{i}] ID: {r['id']} | Score: {r['score']:.4f} | Match: {r['match_type']}\n")
+                out_file.write(f"    Matched Name: {r['matched_name']}\n")
+                out_file.write(f"    Content: {r['content']}\n")
+                out_file.write("\n")
+            
+            out_file.write("\n")
+        
     
-    # ========== 4. 单个查询匹配 ==========
-    print("\n【4】单个查询匹配")
-    query = "如何使用 set_max_transition 和 set_max_fanout 命令"
-    results = matcher.match(query, mode="regex")
-    print_match_results(query, results)
-    
-    # ========== 5. 不同匹配模式对比 ==========
-    print("\n【5】不同匹配模式对比")
-    test_query = "什么是 setup slack"
-    
-    for mode in ["regex", "exact", "fuzzy"]:
-        results = matcher.match(test_query, mode=mode)
-        print(f"\n   模式: {mode}")
-        print(f"   匹配数: {len(results)}")
-        if results:
-            print(f"   首个结果: {results[0].name} ({results[0].match_type})")
-    
-    # ========== 6. 批量匹配 ==========
-    print("\n【6】批量匹配示例")
-    batch_queries = SAMPLE_QUERIES[:5]
-    batch_results = matcher.batch_match(batch_queries)
-    
-    for query, results in batch_results.items():
-        print(f"\n   Query: {query[:40]}...")
-        print(f"   匹配: {[r.name for r in results[:3]]}")
-    
-    # ========== 7. 完整示例查询 ==========
-    print("\n【7】完整示例查询")
-    for query in SAMPLE_QUERIES:
-        results = matcher.match(query)
-        print_match_results(query, results, max_show=3)
-    
-    # ========== 8. 获取特定实例 ==========
-    print("\n【8】根据名称获取实例")
-    name_to_find = "set_max_transition"
-    instances = matcher.get_instance_by_name(name_to_find)
-    print(f"   名称 '{name_to_find}' 对应的实例:")
-    for inst in instances:
-        print(f"      ID: {inst.id}")
-        print(f"      内容: {inst.content[:60]}...")
-    
-    print("\n" + "=" * 70)
-    print("✅ 演示完成")
-    print("=" * 70)
+    print("\n" + "=" * 60)
+    print(f"结果已保存到: {OUTPUT_PATH}")
+    print("=" * 60)
 
 
 if __name__ == "__main__":
