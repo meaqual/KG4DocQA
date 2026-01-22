@@ -28,7 +28,8 @@ def extract_kg_database(input_path, output_path=None):
     stats = {
         "total_instances": 0,
         "total_records": 0,
-        "by_field": {"usage": 0, "description": 0, "scenarios": 0}
+        "by_field": {"usage": 0, "description": 0, "scenarios": 0},
+        "nested_records": 0  # 嵌套字段提取的记录数
     }
     
     # 遍历每个类别
@@ -41,26 +42,25 @@ def extract_kg_database(input_path, output_path=None):
             
             stats["total_instances"] += 1
             
-            # 提取每个字段
+            # 提取顶层字段
             for field in EXTRACT_FIELDS:
                 value = item.get(field)
                 if value is None:
                     continue
                 
-                # 处理值
                 text = process_field_value(value)
                 
                 if text:
-                    # 文本已存在则追加 id
-                    if text in database:
-                        existing = database[text]
-                        if item_id not in existing.split(", "):
-                            database[text] = f"{existing}, {item_id}"
-                    else:
-                        database[text] = item_id
-                    
+                    add_to_database(database, text, item_id)
                     stats["total_records"] += 1
                     stats["by_field"][field] += 1
+            
+            # 提取 values 字段中的嵌套内容
+            values = item.get("values")
+            if values:
+                nested_count = extract_from_values(values, item_id, database)
+                stats["nested_records"] += nested_count
+                stats["total_records"] += nested_count
     
     # 保存结果
     with open(output_path, 'w', encoding='utf-8') as f:
@@ -79,9 +79,106 @@ def extract_kg_database(input_path, output_path=None):
     print(f"\n📝 各字段记录数:")
     for field, count in stats["by_field"].items():
         print(f"   - {field}: {count}")
+    print(f"   - 嵌套字段 (values/key_values): {stats['nested_records']}")
     print(f"{'='*60}")
     
     return database
+
+
+def extract_from_values(values, item_id, database):
+    """
+    从 values 字段递归提取 usage / scenarios 等信息
+    
+    values 结构示例:
+    [
+        {
+            "usage": "第一个参数的含义",
+            "type": "类型",
+            "key_values": [
+                {
+                    "value": "关键值1",
+                    "usage": "关键值1的含义",
+                    "scenarios": "关键值1的使用场景"
+                }
+            ]
+        }
+    ]
+    """
+    count = 0
+    
+    if not values:
+        return count
+    
+    # 确保 values 是列表
+    if not isinstance(values, list):
+        values = [values]
+    
+    for val_item in values:
+        if not isinstance(val_item, dict):
+            continue
+        
+        # 提取 values 中的 usage / scenarios / description
+        for field in EXTRACT_FIELDS:
+            text = val_item.get(field)
+            if text:
+                text = process_field_value(text)
+                if text:
+                    add_to_database(database, text, item_id)
+                    count += 1
+        
+        # 递归提取 key_values 中的内容
+        key_values = val_item.get("key_values")
+        if key_values:
+            count += extract_from_key_values(key_values, item_id, database)
+    
+    return count
+
+
+def extract_from_key_values(key_values, item_id, database):
+    """
+    从 key_values 字段提取 usage / scenarios 信息
+    
+    key_values 结构示例:
+    [
+        {
+            "value": "关键值1",
+            "usage": "关键值1的含义",
+            "scenarios": "关键值1的使用场景"
+        }
+    ]
+    """
+    count = 0
+    
+    if not key_values:
+        return count
+    
+    if not isinstance(key_values, list):
+        key_values = [key_values]
+    
+    for kv_item in key_values:
+        if not isinstance(kv_item, dict):
+            continue
+        
+        # 提取 key_values 中的 usage / scenarios / description
+        for field in EXTRACT_FIELDS:
+            text = kv_item.get(field)
+            if text:
+                text = process_field_value(text)
+                if text:
+                    add_to_database(database, text, item_id)
+                    count += 1
+    
+    return count
+
+
+def add_to_database(database, text, item_id):
+    """将文本添加到数据库，处理重复文本的情况"""
+    if text in database:
+        existing = database[text]
+        if item_id not in existing.split(", "):
+            database[text] = f"{existing}, {item_id}"
+    else:
+        database[text] = item_id
 
 
 def process_field_value(value):
@@ -106,6 +203,7 @@ if __name__ == "__main__":
         print("用法: python buildDatabase.py <input.json> [output.json]")
         print("示例: python buildDatabase.py merged_classes_with_id.json")
         print(f"\n提取字段: {', '.join(EXTRACT_FIELDS)}")
+        print("同时会递归提取 values 和 key_values 中的嵌套字段")
         sys.exit(1)
     
     input_path = sys.argv[1]
