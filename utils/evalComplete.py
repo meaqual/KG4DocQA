@@ -55,6 +55,7 @@ CLASS_SCHEMAS = {
 def check_missing_fields(input_path, output_path=None):
     """
     检查 KG 中每个实例是否缺失必需字段
+    注意：字段存在但值为 null 不算缺失，只有字段不存在才算缺失
     """
     
     # 默认输出路径
@@ -85,10 +86,10 @@ def check_missing_fields(input_path, output_path=None):
             item_id = item.get("id", "NO_ID")
             item_name = item.get("name", "NO_NAME")
             
-            # 检查缺失的必需字段
+            # 检查缺失的必需字段（只检查字段是否存在，不检查值是否为 null）
             missing_fields = []
             for field in required_fields:
-                if field not in item or item[field] is None or item[field] == "":
+                if field not in item:
                     missing_fields.append(field)
             
             if missing_fields:

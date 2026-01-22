@@ -12,7 +12,7 @@ from typing import List, Dict, Tuple, Optional, Set
 from dataclasses import dataclass, field
 from collections import defaultdict
 
-
+os.environ['CUDA_VISIBLE_DEVICES'] = '5'
 # ============ 全局配置 ============
 MATCHER_CONFIG = {
     # 匹配模式: "regex" | "exact" | "fuzzy"
