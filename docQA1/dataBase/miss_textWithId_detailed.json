@@ -1,0 +1,44 @@
+{
+  "Concept": [
+    {
+      "name": "POCV",
+      "count": 2,
+      "ids": [
+        "kg_Concept_0013",
+        "kg_Concept_0140"
+      ],
+      "instances": [
+        {
+          "id": "kg_Concept_0013",
+          "class": "Concept",
+          "name": "POCV",
+          "description": "POCV（Post-Layout Optimization and Check）是EDA工具中用于在布线后对设计进行优化和检查的过程。其主要作用是确保设计在物理实现后仍满足时序、电气和制造要求。POCV的影响因素包括布线延迟、寄生电容、电源网络完整性以及制造工艺的变异。通过POCV，可以检测并修正由于物理实现引入的时序违规或电气问题，从而提高设计的可靠性和良率。",
+          "chunk_id": [
+            "_xtop_abb_0004_0001",
+            "_xtop_intro_0006_0001",
+            "_xtop_intro_0006_0001",
+            "_xtop_intro_0007_0001",
+            "_xtop_intro_0007_0001",
+            "_xtop_release_0011_0001",
+            "_xtop_ug_0044_0001",
+            "_xtop_ug_0053_0001",
+            "_xtop_ug_0061_0001",
+            "_xtop_handbook_0056_0006",
+            "_xtop_handbook_0206_0001",
+            "_xtop_handbook_0239_0004",
+            "_xtop_handbook_0261_0001",
+            "_xtop_training_0046_0001",
+            "_xtop_handbook_0249_0001"
+          ]
+        },
+        {
+          "id": "kg_Concept_0140",
+          "class": "Concept",
+          "name": "POCV",
+          "description": "POCV（Power Optimization Constraint Verification）是EDA工具中用于验证动态功耗优化约束条件的一个概念。其主要作用是确保在进行动态功耗优化时，满足设计的功耗目标和约束条件。POCV会影响优化过程中对不同引脚（pins）的优先级分配，从而影响优化结果。影响POCV的因素包括引脚的动态功耗、约束边界的余量、拥塞情况等。",
+          "chunk_id": "_xtop_handbook_0249_0001"
+        }
+      ]
+    }
+  ]
+}

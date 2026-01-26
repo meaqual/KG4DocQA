@@ -210,7 +210,7 @@ if __name__ == "__main__":
             results = retriever.retrieve(
                 query=query,
                 topk_embed=20,
-                topk_rerank=5,
+                topk_rerank=10,
                 score_thresh=0.3
             )
             

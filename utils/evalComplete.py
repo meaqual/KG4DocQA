@@ -92,6 +92,7 @@ def check_missing_fields(input_path, output_path=None):
                 if field not in item:
                     missing_fields.append(field)
             
+            
             if missing_fields:
                 total_missing += 1
                 class_missing.append({
@@ -107,19 +108,20 @@ def check_missing_fields(input_path, output_path=None):
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(missing_report, f, ensure_ascii=False, indent=2)
     
+    
     # 打印统计信息
     print(f"\n{'='*60}")
-    print(f"📋 字段缺失检查报告")
+    print(f"字段缺失检查报告")
     print(f"{'='*60}")
     print(f"   输入文件: {input_path}")
     print(f"   报告输出: {output_path}")
-    print(f"\n📊 统计:")
+    print(f"\n统计:")
     print(f"   检查总数: {total_checked} 条")
     print(f"   缺失总数: {total_missing} 条")
     print(f"   完整率: {((total_checked - total_missing) / total_checked * 100):.2f}%")
     
     if missing_report:
-        print(f"\n❌ 各类别缺失详情:")
+        print(f"\n各类别缺失详情:")
         for class_name, items in missing_report.items():
             print(f"\n   【{class_name}】 缺失 {len(items)} 条:")
             for item in items[:5]:  # 只显示前5条
@@ -128,10 +130,10 @@ def check_missing_fields(input_path, output_path=None):
             if len(items) > 5:
                 print(f"      ... 还有 {len(items) - 5} 条，详见输出文件")
     else:
-        print(f"\n✅ 所有实例的必需字段都完整！")
-    
+        print(f"\n所有实例的必需字段都完整！")    
     print(f"\n{'='*60}")
-    
+
+
     return missing_report
 
 
