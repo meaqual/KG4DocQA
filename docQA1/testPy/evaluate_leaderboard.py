@@ -2,7 +2,7 @@
 
 import json
 import numpy as np
-from typing import List, Dict, Set, Optional, Tuple, Union
+from typing import List, Dict, Set, Optional, Tuple
 import torch
 import os
 from dataclasses import dataclass
@@ -36,7 +36,7 @@ MODELS_CONFIG = {
 DATABASE_PATH = "/mnt/public/sichuan_a/hyh/queryTest1/qaSchema/xtopDoc/docQA1/dataBase/textContent.json"
 BENCHMARK_PATH = "/mnt/public/sichuan_a/hyh/queryTest1/qaSchema/xtopDoc/docQA1/testData/gt_benchmark.json"
 KG_TO_CHUNK_PATH = "/mnt/public/sichuan_a/hyh/queryTest1/qaSchema/xtopDoc/docQA1/dataBase/textWithId.json"
-OUTPUT_DIR = "/mnt/public/sichuan_a/hyh/queryTest1/qaSchema/xtopDoc/docQA1/results/exp2"
+OUTPUT_DIR = "/mnt/public/sichuan_a/hyh/queryTest1/qaSchema/xtopDoc/docQA1/results/exp3"
 
 # 检索结果保存的 Top-K
 SAVE_TOPK = 20
@@ -203,6 +203,7 @@ class RetrievalItem:
     chunk_ids: List[str]
     content: str
     score: float
+    is_hit: bool = False  # 是否命中 GT
 
 
 @dataclass
@@ -227,31 +228,41 @@ class EvalResult:
 
 
 # ============ 评估函数 ============
-def calculate_recall_at_k(retrieved_chunk_ids: List[str], gt_chunk_ids: Set[str], k: int) -> float:
-    """计算 Recall@K"""
-    if not gt_chunk_ids:
-        return 0.0
-    retrieved_set = set(retrieved_chunk_ids[:k])
-    hits = len(retrieved_set & gt_chunk_ids)
-    return hits / len(gt_chunk_ids)
+def calculate_metrics_at_k(retrieved_items: List[RetrievalItem], gt_chunk_ids: Set[str], k_values: List[int]) -> Tuple[Dict[int, float], Dict[int, int]]:
+    """
+    计算 Recall@K 和 Hit@K
+    
+    对于每个 K，我们看前 K 个检索结果中的所有 chunk_ids 是否覆盖了 gt_chunk_ids
+    """
+    recall_at_k = {}
+    hit_at_k = {}
+    
+    for k in k_values:
+        # 收集前 K 个结果的所有 chunk_ids（去重）
+        retrieved_chunk_ids = set()
+        for item in retrieved_items[:k]:
+            for cid in item.chunk_ids:
+                retrieved_chunk_ids.add(cid)
+        
+        # 计算命中数
+        hits = len(retrieved_chunk_ids & gt_chunk_ids)
+        
+        # Recall@K
+        if len(gt_chunk_ids) > 0:
+            recall_at_k[k] = hits / len(gt_chunk_ids)
+        else:
+            recall_at_k[k] = 0.0
+        
+        # Hit@K (只要有一个命中就算 1)
+        hit_at_k[k] = 1 if hits > 0 else 0
+    
+    return recall_at_k, hit_at_k
 
 
-def calculate_hit_at_k(retrieved_chunk_ids: List[str], gt_chunk_ids: Set[str], k: int) -> int:
-    """计算 Hit@K"""
-    retrieved_set = set(retrieved_chunk_ids[:k])
-    return 1 if (retrieved_set & gt_chunk_ids) else 0
-
-
-def get_retrieved_chunk_ids_from_items(items: List[RetrievalItem]) -> List[str]:
-    """从检索结果项列表中提取去重后的 chunk_id 列表"""
-    retrieved_chunk_ids = []
-    seen = set()
-    for item in items:
-        for cid in item.chunk_ids:
-            if cid not in seen:
-                retrieved_chunk_ids.append(cid)
-                seen.add(cid)
-    return retrieved_chunk_ids
+def mark_hits(retrieved_items: List[RetrievalItem], gt_chunk_ids: Set[str]) -> None:
+    """标记每个检索结果是否命中 GT"""
+    for item in retrieved_items:
+        item.is_hit = bool(set(item.chunk_ids) & gt_chunk_ids)
 
 
 def evaluate_embedding_only(
@@ -262,8 +273,8 @@ def evaluate_embedding_only(
     """评估仅使用 Embedding 的检索效果"""
     
     k_values = [1, 3, 5, 10, 20]
-    recall_scores = {k: [] for k in k_values}
-    hit_scores = {k: [] for k in k_values}
+    all_recall = {k: [] for k in k_values}
+    all_hit = {k: [] for k in k_values}
     query_results: List[QueryResult] = []
     
     # 构建向量索引
@@ -299,29 +310,27 @@ def evaluate_embedding_only(
                 score=float(scores[idx])
             ))
         
+        # 标记命中
+        mark_hits(retrieved_items, gt_chunk_ids)
+        
         # 计算指标
-        retrieved_chunk_ids = get_retrieved_chunk_ids_from_items(retrieved_items)
-        item_recall = {}
-        item_hit = {}
+        recall_at_k, hit_at_k = calculate_metrics_at_k(retrieved_items, gt_chunk_ids, k_values)
+        
         for k in k_values:
-            r = calculate_recall_at_k(retrieved_chunk_ids, gt_chunk_ids, k)
-            h = calculate_hit_at_k(retrieved_chunk_ids, gt_chunk_ids, k)
-            recall_scores[k].append(r)
-            hit_scores[k].append(h)
-            item_recall[k] = r
-            item_hit[k] = h
+            all_recall[k].append(recall_at_k[k])
+            all_hit[k].append(hit_at_k[k])
         
         query_results.append(QueryResult(
             query_id=query_id,
             question=question,
             gt_chunk_ids=list(gt_chunk_ids),
             retrieved_items=retrieved_items[:SAVE_TOPK],
-            recall_at_k=item_recall,
-            hit_at_k=item_hit
+            recall_at_k=recall_at_k,
+            hit_at_k=hit_at_k
         ))
     
-    avg_recall = {k: np.mean(v) for k, v in recall_scores.items()}
-    avg_hit = {k: np.mean(v) for k, v in hit_scores.items()}
+    avg_recall = {k: np.mean(v) for k, v in all_recall.items()}
+    avg_hit = {k: np.mean(v) for k, v in all_hit.items()}
     
     return avg_recall, avg_hit, query_results
 
@@ -335,8 +344,8 @@ def evaluate_embedding_with_reranker(
     """评估 Embedding + Reranker 的检索效果"""
     
     k_values = [1, 3, 5, 10, 20]
-    recall_scores = {k: [] for k in k_values}
-    hit_scores = {k: [] for k in k_values}
+    all_recall = {k: [] for k in k_values}
+    all_hit = {k: [] for k in k_values}
     query_results: List[QueryResult] = []
     
     # 构建向量索引
@@ -385,29 +394,27 @@ def evaluate_embedding_with_reranker(
                 score=doc["rerank_score"]
             ))
         
+        # 标记命中
+        mark_hits(retrieved_items, gt_chunk_ids)
+        
         # 计算指标
-        retrieved_chunk_ids = get_retrieved_chunk_ids_from_items(retrieved_items)
-        item_recall = {}
-        item_hit = {}
+        recall_at_k, hit_at_k = calculate_metrics_at_k(retrieved_items, gt_chunk_ids, k_values)
+        
         for k in k_values:
-            r = calculate_recall_at_k(retrieved_chunk_ids, gt_chunk_ids, k)
-            h = calculate_hit_at_k(retrieved_chunk_ids, gt_chunk_ids, k)
-            recall_scores[k].append(r)
-            hit_scores[k].append(h)
-            item_recall[k] = r
-            item_hit[k] = h
+            all_recall[k].append(recall_at_k[k])
+            all_hit[k].append(hit_at_k[k])
         
         query_results.append(QueryResult(
             query_id=query_id,
             question=question,
             gt_chunk_ids=list(gt_chunk_ids),
             retrieved_items=retrieved_items[:SAVE_TOPK],
-            recall_at_k=item_recall,
-            hit_at_k=item_hit
+            recall_at_k=recall_at_k,
+            hit_at_k=hit_at_k
         ))
     
-    avg_recall = {k: np.mean(v) for k, v in recall_scores.items()}
-    avg_hit = {k: np.mean(v) for k, v in hit_scores.items()}
+    avg_recall = {k: np.mean(v) for k, v in all_recall.items()}
+    avg_hit = {k: np.mean(v) for k, v in all_hit.items()}
     
     return avg_recall, avg_hit, query_results
 
@@ -451,7 +458,7 @@ def save_retrieval_results(result: EvalResult, output_dir: str, timestamp: str):
             f.write(f"Question: {qr.question}\n")
             f.write("-" * 100 + "\n")
             f.write(f"Ground Truth Chunk IDs: {qr.gt_chunk_ids}\n")
-            f.write(f"Recall@5: {qr.recall_at_k[5]:.4f} | Hit@5: {qr.hit_at_k[5]}\n")
+            f.write(f"Recall@1: {qr.recall_at_k[1]:.4f} | Recall@5: {qr.recall_at_k[5]:.4f} | Hit@5: {qr.hit_at_k[5]}\n")
             f.write("-" * 100 + "\n")
             f.write(f"检索结果数量: {len(qr.retrieved_items)}\n")
             
@@ -460,12 +467,7 @@ def save_retrieval_results(result: EvalResult, output_dir: str, timestamp: str):
             f.write("-" * 100 + "\n")
             
             for rank, item in enumerate(qr.retrieved_items, 1):
-                # 检查是否命中
-                hit_marker = ""
-                for cid in item.chunk_ids:
-                    if cid in qr.gt_chunk_ids:
-                        hit_marker = " ★HIT★"
-                        break
+                hit_marker = " ★HIT★" if item.is_hit else ""
                 
                 f.write(f"[{rank}] ID: {item.kg_id} | Score: {item.score:.4f}{hit_marker}\n")
                 f.write(f"    Chunk IDs: {item.chunk_ids}\n")

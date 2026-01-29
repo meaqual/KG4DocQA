@@ -29,6 +29,7 @@ client = OpenAI(
     api_key=APIKEY,
     timeout=300.0
 )
+   
 
 def parse_json_response(content):
     """尝试从响应中解析JSON，支持markdown格式"""
@@ -36,6 +37,7 @@ def parse_json_response(content):
         return None
     
     content = content.strip()
+    
     
     # 尝试提取markdown代码块中的JSON
     json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', content)
@@ -103,8 +105,8 @@ def stage2_extract(document, identified):
             extracted[cls].append(data)
 
     return extracted
-
-
+            
+            
 def stage3_verify(extracted):
     """Stage 3: Verify and return report string"""
     return verify_schemas(

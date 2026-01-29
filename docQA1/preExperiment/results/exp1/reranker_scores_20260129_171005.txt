@@ -1,0 +1,74 @@
+=========================================================================================
+RERANKER SCORES BY GRANULARITY
+=========================================================================================
+Query ID   Granularity              bge-reranker-v2-gemma bge-reranker-v2-gemma-finetuned
+-----------------------------------------------------------------------------------------
+1          Granularity1                          5.300781                       0.564941
+1          Granularity2                          5.246094                       0.577148
+1          Granularity3                          5.164062                       0.537598
+1          Granularity4                          5.203125                       0.530762
+1          Granularity5                          5.273438                       0.511230
+1          Granularity6                          4.984375                       0.256348
+
+2          Granularity1                          5.132812                       0.238525
+2          Granularity2                          4.964844                       0.263428
+2          Granularity3                          4.906250                       0.333984
+2          Granularity4                          4.789062                       0.306641
+2          Granularity5                          4.628906                       0.217529
+2          Granularity6                          4.566406                       0.286133
+
+3          Granularity1                          5.343750                       0.515137
+3          Granularity2                          5.300781                       0.537598
+3          Granularity3                          5.144531                       0.597656
+3          Granularity4                          5.160156                       0.488525
+3          Granularity5                          5.093750                       0.529785
+3          Granularity6                          5.265625                       0.350586
+
+4          Granularity1                          4.671875                       0.379883
+4          Granularity2                          4.757812                       0.298584
+4          Granularity3                          4.765625                       0.314453
+4          Granularity4                          4.804688                       0.309082
+4          Granularity5                          4.867188                       0.372803
+4          Granularity6                          4.714844                       0.382080
+
+5          Granularity1                          4.820312                       0.281738
+5          Granularity2                          4.703125                       0.363770
+5          Granularity3                          4.632812                       0.325439
+5          Granularity4                          4.531250                       0.346680
+5          Granularity5                          4.679688                       0.357910
+5          Granularity6                          4.664062                       0.385010
+
+6          Granularity1                          5.218750                       0.478027
+6          Granularity2                          5.085938                       0.419922
+6          Granularity3                          5.019531                       0.343262
+6          Granularity4                          5.035156                       0.406250
+6          Granularity5                          5.105469                       0.401367
+6          Granularity6                          5.000000                       0.454590
+
+7          Granularity1                          5.320312                       0.477051
+7          Granularity2                          5.277344                       0.483398
+7          Granularity3                          5.144531                       0.441406
+7          Granularity4                          5.234375                       0.496582
+7          Granularity5                          5.257812                       0.601562
+7          Granularity6                          5.371094                       0.646484
+
+8          Granularity1                          5.035156                       0.547363
+8          Granularity2                          4.886719                       0.530762
+8          Granularity3                          4.921875                       0.499512
+8          Granularity4                          5.070312                       0.624023
+8          Granularity5                          5.089844                       0.601562
+8          Granularity6                          4.746094                       0.400635
+
+9          Granularity1                          4.828125                       0.540039
+9          Granularity2                          4.750000                       0.483154
+9          Granularity3                          4.800781                       0.590820
+9          Granularity4                          4.992188                       0.451904
+9          Granularity5                          4.785156                       0.422852
+9          Granularity6                          4.832031                       0.471436
+
+10         Granularity1                          4.789062                       0.332764
+10         Granularity2                          4.734375                       0.348877
+10         Granularity3                          4.746094                       0.336670
+10         Granularity4                          4.621094                       0.322021
+10         Granularity5                          4.695312                       0.335205
+10         Granularity6                          4.628906                       0.323975
